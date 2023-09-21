@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Basic Metadata -->
+    <title>Pixel Flux - Own Your Pixel Space</title>
+    <meta name="description" content="PixelFlux allows you to buy and own pixels. Become a permanent owner and earn as layers are added to your pixel.">
+    <meta name="keywords" content="PixelFlux, Buy Pixels, Pixel Ownership, Pixel Layers">
+    <meta name="author" content="Satoru Tamashi">
+
+    <!-- Responsive Design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph (for Facebook, etc.) -->
+    <meta property="og:title" content="PixelFlux - Own Your Pixel Space">
+    <meta property="og:description" content="PixelFlux allows you to buy and own pixels. Become a permanent owner and earn as layers are added to your pixel.">
+    <meta property="og:image" content="social_logo.jpg">
+    <meta property="og:url" content="https://pixelflux.com">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PixelFlux - Own Your Pixel Space">
+    <meta name="twitter:description" content="PixelFlux allows you to buy and own pixels. Become a permanent owner and earn as layers are added to your pixel.">
+    <meta name="twitter:image" content="social_logo.jpg">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="sidebar">
+            <h1>Pixel Flux</h1>
+
+            <!-- Blockchain Dropdown Header -->
+            <div id="blockchain-dropdown">
+                <h2 id="blockchain-heading">Polygon</h2>
+                <div id="dropdown-content">
+                    <p>More coming soon...</p>
+                </div>
+            </div>
+            <!-- About Section -->
+            <br />
+            <details id="about-section">
+                <summary>
+                    <h2><span id="about-icon">&#9654;</span>&nbsp;About</h2>
+                </summary>
+                <div id="about-content">
+                    <p>
+                        PixelFlux allows you to claim ownership over pixel layers.
+                        If you own the topmost layer of a pixel, you can customize its color.
+                    </p>
+                    <p>
+                        While your ownership of a layer is permanent, others can purchase a new layer on top of yours. 
+                        When this happens, the payment for the new layer is distributed among all existing layer owners of that pixel.
+                    </p>
+                    <p>
+                        Each time a layer is added, the pixel's value increases by its base price. 
+                        It's possible to buy several layers at once.
+                    </p>
+                    <p>
+                        Dive in by clicking on a pixel to explore its attributes.
+                    </p>
+                </div>
+            </details>
+            <h2>Current Value</h2>
+            <p id="current-value">-</p>
+
+            <h2>Color Options</h2>
+            <div id="color-options"></div>
+            <h2>History</h2>
+            <ul id="history"></ul>
+        </div>
+        <div id="canvas-container">
+            <canvas id="c"></canvas>
+        </div>
+    </div>
+
+    <script src="main.ts"></script>
+</body>
+
+</html>
