@@ -18,6 +18,8 @@
     "shapes": "^0.4.0"
   },
   "devDependencies": {
-    "pug": "^3.0.2"
+    "node-sass": "^9.0.0",
+    "pug": "^3.0.2",
+    "scss": "^0.2.4"
   }
 }

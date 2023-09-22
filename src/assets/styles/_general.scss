@@ -1,0 +1,46 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  color: #fff;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(45deg, #232323, #141414);
+}
+
+#wrapper {
+  display: flex;
+  height: 100%;
+}
+
+#canvas-container {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+details[open] #about-icon {
+  transform: rotate(90deg);
+}
+
+#about-section summary::-webkit-details-marker {
+  display: none;
+}
+
+#about-section summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+#about-icon {
+  display: inline-block;
+  transition: transform 0.3s;
+}

@@ -1,0 +1,13 @@
+#color-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.color-option {
+  width: 24px;
+  height: 24px;
+  margin: 5px;
+  border-radius: 50%; 
+  cursor: pointer;
+}

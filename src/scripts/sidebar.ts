@@ -127,9 +127,37 @@ export function connectWallet() {
   console.log("Connecting to Polygon...");
 }
 
+export function showWalletModal() {
+  const walletModal = document.getElementById('wallet-modal');
+  if (walletModal) {
+    walletModal.style.display = 'block';
+  }
+}
+
+export function hideWalletModal() {
+  const walletModal = document.getElementById('wallet-modal');
+  if (walletModal) {
+    walletModal.style.display = 'none';
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const connectButton = document.getElementById('connect-wallet');
+  const closeModalButton = document.getElementById('close-modal');
+  const metamaskOption = document.getElementById('metamask-option');
+
   if (connectButton) {
-    connectButton.addEventListener('click', connectWallet);
+    connectButton.addEventListener('click', showWalletModal);
+  }
+
+  if (closeModalButton) {
+    closeModalButton.addEventListener('click', hideWalletModal);
+  }
+
+  if (metamaskOption) {
+    metamaskOption.addEventListener('click', () => {
+      // Logic to connect with MetaMask
+      console.log("Connecting with MetaMask...");
+    });
   }
 });
