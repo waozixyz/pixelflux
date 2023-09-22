@@ -4,7 +4,8 @@
     .tab#polygon-tab(data-content="polygon-content") Polygon
     // .tab#kadena-tab(data-content="kadena-content" disable) wip
   #polygon-content.tab-content.active
-    br
+    button#connect-wallet Connect Wallet
+
     details#about-section
       summary
         h2
@@ -35,7 +36,7 @@
           .color-circle(style="background-color: #FF5733;")
           .purchase-info Value: 70, Contract: 0xABC...DEF
       .pagination
-        button &laquo; Prev
-        button Next &raquo;
+        button#prev-button &laquo; Prev
+        button#next-button Next &raquo;
   #kadena-content.tab-content
     p Coming soon...

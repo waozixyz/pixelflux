@@ -2,6 +2,9 @@ import { default as defaultColors } from '../config/colors.json';
 import { store, setCurrentBlockchainTab } from "./store";
 import { setupCanvas } from "./canvas";
 
+const ITEMS_PER_PAGE = 5;
+let currentPage = 1;
+
 const mockPixelData = [
   { color: "#FF5733", value: 85, contractAddress: "0x1234567890123456789012345678901234567890" },
   { color: "#32a852", value: 80, contractAddress: "0x2345678901234567890123456789012345678901" },
@@ -52,12 +55,16 @@ export function setupColorOptions(canvas: fabric.Canvas) {
   });
 }
 
+function displayHistoryForPage(pageNumber) {
+  const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
 
-export function setupHistory() { 
+  const itemsToDisplay = mockPixelData.slice(startIndex, endIndex);
+
   const historyElement = document.getElementById('history')!;
-  historyElement.innerHTML = ''; 
+  historyElement.innerHTML = '';
 
-  mockPixelData.forEach(data => {
+  itemsToDisplay.forEach(data => {
       const liElement = document.createElement('li');
 
       const colorCircle = document.createElement('div');
@@ -75,6 +82,34 @@ export function setupHistory() {
 
       historyElement.appendChild(liElement);
   });
+
+  // Update the navigation buttons (previous/next) based on the current page
+  const prevButton = document.getElementById('prev-button') as HTMLInputElement;
+  const nextButton = document.getElementById('next-button') as HTMLInputElement;
+
+  if (prevButton && nextButton) {
+    prevButton.disabled = pageNumber <= 1;
+    nextButton.disabled = pageNumber >= Math.ceil(mockPixelData.length / ITEMS_PER_PAGE);
+  }
+}
+
+export function setupHistory() {
+  displayHistoryForPage(currentPage);
+
+  const prevButton = document.getElementById('prev-button');
+  const nextButton = document.getElementById('next-button');
+
+  if (prevButton && nextButton) {
+    prevButton.addEventListener('click', () => {
+      currentPage--;
+      displayHistoryForPage(currentPage);
+    });
+
+    nextButton.addEventListener('click', () => {
+      currentPage++;
+      displayHistoryForPage(currentPage);
+    });
+  }
 }
 
 export function setupBuyButton() {
@@ -85,3 +120,16 @@ export function setupBuyButton() {
     });
   }
 }
+
+
+export function connectWallet() {
+  // Logic for connecting to the Polygon network
+  console.log("Connecting to Polygon...");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const connectButton = document.getElementById('connect-wallet');
+  if (connectButton) {
+    connectButton.addEventListener('click', connectWallet);
+  }
+});
