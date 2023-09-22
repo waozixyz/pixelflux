@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "parcel src/index.html"
+    "start": "parcel src/views/index.pug"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +14,10 @@
   "dependencies": {
     "@types/fabric": "^5.3.4",
     "fabric": "^5.3.0",
-    "parcel-bundler": "^1.12.5",
+    "parcel-bundler": "^1.8.1",
     "shapes": "^0.4.0"
+  },
+  "devDependencies": {
+    "pug": "^3.0.2"
   }
 }

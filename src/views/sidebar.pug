@@ -1,0 +1,41 @@
+#sidebar
+  h1 Pixel Flux
+  #blockchain-tabs
+    .tab#polygon-tab(data-content="polygon-content") Polygon
+    // .tab#kadena-tab(data-content="kadena-content" disable) wip
+  #polygon-content.tab-content.active
+    br
+    details#about-section
+      summary
+        h2
+          span#about-icon &#9654;
+          | &nbsp;About
+      #about-content
+        p 
+          | PixelFlux allows you to claim ownership over pixel layers.
+          | If you own the topmost layer of a pixel, you can customize its color.
+        p 
+          | While your ownership of a layer is permanent, others can purchase a new layer on top of yours. 
+        p
+          | When this happens, the payment for the new layer is distributed among all existing layer owners of that pixel.
+        p 
+          | Each time a layer is added, the pixel's value increases by its base price. 
+          | It's possible to buy several layers at once.
+        p 
+          | Dive in by clicking on a pixel to explore its attributes.
+    div.square-content
+      h2 Current Value
+      p#current-value -
+      button#buy-button Buy
+      h2 Color Options
+      #color-options
+      h2 History
+      ul#history
+        li
+          .color-circle(style="background-color: #FF5733;")
+          .purchase-info Value: 70, Contract: 0xABC...DEF
+      .pagination
+        button &laquo; Prev
+        button Next &raquo;
+  #kadena-content.tab-content
+    p Coming soon...
