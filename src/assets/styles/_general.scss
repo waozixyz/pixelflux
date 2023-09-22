@@ -5,7 +5,8 @@ body, html {
   color: #fff;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  background: linear-gradient(45deg, #232323, #141414);
+  background: linear-gradient(45deg, #232335, #141414);
+
 }
 
 #wrapper {
@@ -26,21 +27,14 @@ canvas {
   left: 0;
 }
 
-
-details[open] #about-icon {
-  transform: rotate(90deg);
-}
-
-#about-section summary::-webkit-details-marker {
+.square-content {
   display: none;
 }
 
-#about-section summary {
-  list-style: none;
-  cursor: pointer;
+a {
+  text-decoration: none;
+  color: #faf;
 }
-
-#about-icon {
-  display: inline-block;
-  transition: transform 0.3s;
+a:hover {
+  color: #f9f;
 }

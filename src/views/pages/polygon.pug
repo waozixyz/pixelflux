@@ -1,0 +1,12 @@
+
+extends ../components/base.pug
+
+block content
+  include ../components/modal.pug
+
+  #wrapper 
+    include ../components/sidebar.pug
+    #canvas-container
+      canvas#c
+
+  script(src="../../scripts/polygon.ts")

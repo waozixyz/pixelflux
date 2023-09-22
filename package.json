@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "parcel src/views/index.pug"
+    "start": "parcel src/views/pages/*.pug"
   },
   "keywords": [],
   "author": "",
@@ -12,12 +12,15 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.22.15",
     "@types/fabric": "^5.3.4",
     "fabric": "^5.3.0",
     "parcel-bundler": "^1.8.1",
     "shapes": "^0.4.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.22.20",
+    "@babel/plugin-transform-runtime": "^7.22.15",
     "node-sass": "^9.0.0",
     "pug": "^3.0.2",
     "scss": "^0.2.4"

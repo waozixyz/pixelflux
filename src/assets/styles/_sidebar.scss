@@ -1,5 +1,5 @@
 #sidebar {
-  width: 250px;
+  width: 220px;
   height: 100%;
   padding: 15px;
   box-shadow: -2px 0 5px rgba(0,0,0,0.3);
@@ -31,4 +31,22 @@
 
 #sidebar::-webkit-scrollbar-thumb:hover {
   background-color: #777;
+}
+
+#address-text {
+  display: flex;
+  align-items: center;
+}
+
+#account-address {
+  max-width: 140px; /* you can adjust this value */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+
+#disconnect-icon {
+  width: 16px; /* adjust as needed */
+  height: 16px;
 }

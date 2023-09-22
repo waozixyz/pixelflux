@@ -1,10 +1,9 @@
 import { setupCanvas } from './canvas';
-import { setupTabs, setupColorOptions, setupHistory } from './sidebar';
+import { setupColorOptions, setupHistory } from './sidebar';
 
 document.addEventListener("DOMContentLoaded", function () {
-    const canvas = setupCanvas();
-    
-    setupTabs();
+    const canvas = setupCanvas("polygon");
+
     setupColorOptions(canvas);
     setupHistory();
 });

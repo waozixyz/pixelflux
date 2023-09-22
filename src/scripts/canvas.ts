@@ -10,14 +10,14 @@ const CELL_SIZE = 32;
 const BACKGROUND_COLOR = "#000";
 
 function getConfigBasedOnCanvasId(canvasId: string) {
-  return canvasId === 'polygon-canvas' ? polygonConfig : defaultConfig;
+  return canvasId === 'polygon' ? polygonConfig : defaultConfig;
 }
 
 function createCanvas(canvasId: string, prop): fabric.Canvas {
   const gridWidth = prop.shape[0].length;
   const gridHeight = prop.shape.length;
   
-  const canvas = new fabric.Canvas(canvasId, { selection: false });
+  const canvas = new fabric.Canvas("c", { selection: false });
   canvas.setWidth(gridWidth * CELL_SIZE);
   canvas.setHeight(gridHeight * CELL_SIZE);
   canvas.backgroundColor = BACKGROUND_COLOR;
@@ -73,7 +73,6 @@ function resizeCanvas(canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
       const width = canvasContainer.clientWidth;
       const height = canvasContainer.clientHeight;
       
-      // Compute the scale factor
       const scaleX = width / (gridWidth * CELL_SIZE);
       const scaleY = height / (gridHeight * CELL_SIZE);
       const scale = Math.min(scaleX, scaleY);
@@ -94,10 +93,9 @@ function resizeCanvas(canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
 }
 
 
-export function setupCanvas(): fabric.Canvas {
+export function setupCanvas(canvasId: string): fabric.Canvas {
   displaySquareContent(false);
 
-  const canvasId = (store.currentBlockchainTab === 'polygon-content') ? 'polygon-canvas' : 'default-canvas';
   if (canvasCache[canvasId]) {
     showCanvas(canvasId);
     return canvasCache[canvasId];
@@ -134,11 +132,10 @@ function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
     for (let x = 0; x < gridWidth; x++) {
       let isX = currentShape[y] ? currentShape[y][x] ? currentShape[y][x] === "x" : false : false;
       let fillColor = "#000";
-      let currentValue = prop.initialValue * (y + 0.3) * (x + 0.3);
+      let currentValue = prop.initialValue * (y + 1) * (x + 1) * 3;
       if (isX) {
-          let darkeningFactor = Math.floor(255 - 255 * (((y / gridHeight) + (x / gridWidth))));
-          if (darkeningFactor <= 0) darkeningFactor = 0;
-          if (darkeningFactor >= 255) darkeningFactor = 255;
+          const positionFactor = 1 - (x / gridWidth + y / gridHeight) / 2;
+          const darkeningFactor = Math.floor(255 * positionFactor);
 
           const redValue = Math.floor((prop.color.r * (255 - darkeningFactor) / 255) + (255 * darkeningFactor / 255));
           const greenValue = Math.floor((prop.color.g * (255 - darkeningFactor) / 255) + (255 * darkeningFactor / 255));
@@ -149,7 +146,7 @@ function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
           const blueHex = blueValue.toString(16).padStart(2, "0");
 
           fillColor = `#${redHex}${greenHex}${blueHex}`;
-          currentValue *= (255 / (darkeningFactor + 1));
+          currentValue *= (255 / (darkeningFactor + 1)) * 9;
       } 
 
       const square = new fabric.Rect({
@@ -187,9 +184,6 @@ function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
     }
   }
   canvas.add(...squares);
-
-  showCanvas('polygon-canvas');
-  canvasCache['polygon-canvas'] = canvas;
 
   return canvas;
 }

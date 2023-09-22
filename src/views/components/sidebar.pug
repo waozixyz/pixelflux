@@ -1,0 +1,25 @@
+#sidebar
+  h1
+    a(href="/") &larr;
+  h1 Pixelflux
+  button#connect-wallet
+    span#connect-text Connect Wallet
+    span#address-text(style="display: none;")
+      span#account-address
+
+  div.square-content
+    h2 Current Value
+    p#current-value -
+    button#buy-button Buy
+    h2 Color Options
+    #color-options
+    h2 History
+    ul#history
+      li
+        .color-circle(style="background-color: #FF5733;")
+        .purchase-info Value: 70, Contract: 0xABC...DEF
+    .pagination
+      button#prev-button &laquo; Prev
+      button#next-button Next &raquo;
+
+  br
