@@ -119,7 +119,6 @@ const displayConnectedAddress = (address: string) => {
   document.getElementById('connect-text').style.display = 'none';
   document.getElementById('address-text').style.display = 'flex';
   document.getElementById('account-address').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
-  document.getElementById('disconnect-icon').style.display = 'block';
 }
 
 document.addEventListener("DOMContentLoaded", async() => {
@@ -185,12 +184,5 @@ document.addEventListener("DOMContentLoaded", async() => {
       }
     }
   }
-  
-  document.getElementById('disconnect-icon').addEventListener('click', () => {
-    window.ethereum.disconnect();
-    document.getElementById('connect-text').style.display = 'block';
-    document.getElementById('address-text').style.display = 'none';
-    document.getElementById('disconnect-icon').style.display = 'none';
-});
 
 });

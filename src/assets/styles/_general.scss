@@ -1,12 +1,10 @@
 body, html {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 100vh;
   color: #fff;
-  overflow: hidden;
   font-family: Arial, sans-serif;
   background: linear-gradient(45deg, #232335, #141414);
-
 }
 
 #wrapper {
@@ -33,8 +31,34 @@ canvas {
 
 a {
   text-decoration: none;
-  color: #faf;
-}
-a:hover {
-  color: #f9f;
+  color: #a8a8f8;
+  position: relative;
+  transition: color 0.3s, transform 0.3s;
+
+  &:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: #a8a8f8;
+    bottom: 0;
+    left: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+  }
+
+  &:hover {
+    color: #c9c9ff;
+    transform: scale(1.05);
+    &:before {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  &:active, &:focus {
+    outline: none;
+    color: #e1e1ff;
+  }
 }

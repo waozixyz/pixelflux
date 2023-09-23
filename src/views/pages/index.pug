@@ -1,5 +1,8 @@
 extends ../components/base.pug
 
+block variables
+  - let stylePath = "../../assets/styles/homepage.scss"
+
 block content
   .homepage-container
     img.logo(src="../../assets/logo.png" alt="PixelFlux Logo" width=256)

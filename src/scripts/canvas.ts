@@ -2,20 +2,21 @@ import { fabric } from "fabric";
 import { roundToTwoSigFigs } from './utils';
 import * as polygonConfig from '../config/polygon.json';
 import * as defaultConfig from '../config/default.json';
-import { CustomRectOptions } from "./interfaces";
+import { CustomRectOptions, Cell } from "./interfaces";
 import { store, setSelectedSquare } from "./store";
 
 const canvasCache: { [id: string]: fabric.Canvas } = {};
 const CELL_SIZE = 32;
+const GRID_COLOR = "#333";
 const BACKGROUND_COLOR = "#000";
 
 function getConfigBasedOnCanvasId(canvasId: string) {
   return canvasId === 'polygon' ? polygonConfig : defaultConfig;
 }
 
-function createCanvas(canvasId: string, prop): fabric.Canvas {
-  const gridWidth = prop.shape[0].length;
-  const gridHeight = prop.shape.length;
+function createCanvas(canvasId: string, allCells: Cell[][]): fabric.Canvas {
+  const gridHeight = allCells.length;
+  const gridWidth = allCells[0].length;
   
   const canvas = new fabric.Canvas("c", { selection: false });
   canvas.setWidth(gridWidth * CELL_SIZE);
@@ -91,9 +92,12 @@ function resizeCanvas(canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
       canvas.calcOffset();
   }
 }
+function fromWeiToMatic(weiValue) {
+  return Number(weiValue) / 10**18;
+}
 
 
-export function setupCanvas(canvasId: string): fabric.Canvas {
+export function setupCanvas(canvasId: string, allCells: Cell[][]): fabric.Canvas {
   displaySquareContent(false);
 
   if (canvasCache[canvasId]) {
@@ -102,8 +106,8 @@ export function setupCanvas(canvasId: string): fabric.Canvas {
   }
 
   const prop = getConfigBasedOnCanvasId(canvasId);
-  const canvas = createCanvas(canvasId, prop);
-  setupCanvasContent(canvas, prop);
+  const canvas = createCanvas(canvasId, allCells);
+  setupCanvasContent(canvas, allCells);
   canvasCache[canvasId] = canvas;
 
   return canvas;
@@ -116,9 +120,9 @@ function displaySquareContent(show: boolean) {
   }
 }
 
-function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
-  const gridWidth = prop.shape[0].length;
-  const gridHeight = prop.shape.length;
+function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][]): fabric.Canvas {
+  const gridHeight = allCells.length;
+  const gridWidth = allCells[0].length;
 
   // Set canvas background to the grid image
   const gridImageUrl = generateGridImage(gridWidth, gridHeight);
@@ -126,33 +130,18 @@ function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
   canvas.backgroundColor = "#000";
 
   const squares: fabric.Rect[] = [];
-  const currentShape: string[] = prop.shape;
-
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
-      let isX = currentShape[y] ? currentShape[y][x] ? currentShape[y][x] === "x" : false : false;
       let fillColor = "#000";
-      let currentValue = prop.initialValue * (y + 1) * (x + 1) * 3;
-      if (isX) {
-          const positionFactor = 1 - (x / gridWidth + y / gridHeight) / 2;
-          const darkeningFactor = Math.floor(255 * positionFactor);
-
-          const redValue = Math.floor((prop.color.r * (255 - darkeningFactor) / 255) + (255 * darkeningFactor / 255));
-          const greenValue = Math.floor((prop.color.g * (255 - darkeningFactor) / 255) + (255 * darkeningFactor / 255));
-          const blueValue = Math.floor((prop.color.b * (255 - darkeningFactor) / 255) + (255 * darkeningFactor / 255));
-
-          const redHex = redValue.toString(16).padStart(2, "0");
-          const greenHex = greenValue.toString(16).padStart(2, "0");
-          const blueHex = blueValue.toString(16).padStart(2, "0");
-
-          fillColor = `#${redHex}${greenHex}${blueHex}`;
-          currentValue *= (255 / (darkeningFactor + 1)) * 9;
-      } 
-
+      let cell = allCells[y][x];
+      let currentValue = fromWeiToMatic(cell.baseValue);
+      if (cell.layers.length > 0) {
+        fillColor = cell.layers[cell.layers.length - 1].color;
+      }
       const square = new fabric.Rect({
           width: CELL_SIZE,
           height: CELL_SIZE,
-          stroke: prop.gridColor,
+          stroke: GRID_COLOR,
           fill: fillColor,
           top: (CELL_SIZE * y),
           left: (CELL_SIZE * x),
@@ -161,7 +150,7 @@ function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
           hasControls: false,
           hoverCursor: 'pointer',
           originalFill: fillColor,
-          squareValue: roundToTwoSigFigs(currentValue),
+          squareValue: currentValue,
       } as CustomRectOptions);
 
       square.on('mousedown', function (e) {
@@ -179,11 +168,11 @@ function setupCanvasContent(canvas: fabric.Canvas, prop): fabric.Canvas {
         const currentValueElement = document.getElementById('current-value')!;
         currentValueElement.textContent = store.selectedSquare.squareValue.toString();
       });
-
       squares.push(square);
     }
   }
-  canvas.add(...squares);
+  canvas.add(...squares); 
 
+  
   return canvas;
 }
