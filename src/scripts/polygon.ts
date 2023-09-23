@@ -1,6 +1,8 @@
 import { setupCanvas } from './canvas';
 import { setupColorOptions, setupHistory } from './sidebar';
 import { Contract, BrowserProvider } from 'ethers';
+import contractConfig from '../config/contracts.json';
+
 import Pixelflux1JSON from '../../build/contracts/Pixelflux1.json';
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -10,26 +12,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (accounts.length > 0) {
             const provider: BrowserProvider = new BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            
+            const { Pixelflux1, Pixelflux2, Pixelflux3 } = contractConfig.polygon;
+
             const contractABI = Pixelflux1JSON.abi;
-            const contractAddress = "0xE4eB7603a1f9BC2a90475B2999f65115cFA5c397";
-            const contract = new Contract(contractAddress, contractABI, signer);
-
-            try {
-
-                // const [baseValue, color, layersLength] = await contract.getCellState(5,3);
-                // console.log(baseValue.toString(), color, layersLength.toString());
+            // Fetch allCells for all stages
+            const stages = [];
+            for (const address of [Pixelflux1, Pixelflux2, Pixelflux3]) {
+                const contract = new Contract(address, contractABI, signer);
                 const allCells = await contract.getAllCellStates();
-                try {
-                    const canvas = setupCanvas("polygon", allCells);
-                    setupColorOptions(canvas);
-                    setupHistory();
-                } catch (error) {
-                    console.error("Error setting up canvas:", error);
-                }
-
+                stages.push(allCells);
+            }
+            
+            try {
+                // For now, only use the first stage (index 0)
+                const canvas = setupCanvas("polygon", stages);
+                setupColorOptions(canvas);
+                setupHistory();
             } catch (error) {
-                console.error("Error calling getCellState:", error);
+                console.error("Error setting up canvas:", error);
             }
         }
     }

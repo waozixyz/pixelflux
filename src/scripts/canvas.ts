@@ -1,7 +1,4 @@
 import { fabric } from "fabric";
-import { roundToTwoSigFigs } from './utils';
-import * as polygonConfig from '../config/polygon.json';
-import * as defaultConfig from '../config/default.json';
 import { CustomRectOptions, Cell } from "./interfaces";
 import { store, setSelectedSquare } from "./store";
 
@@ -10,39 +7,36 @@ const CELL_SIZE = 32;
 const GRID_COLOR = "#333";
 const BACKGROUND_COLOR = "#000";
 
-function getConfigBasedOnCanvasId(canvasId: string) {
-  return canvasId === 'polygon' ? polygonConfig : defaultConfig;
-}
-
-function createCanvas(canvasId: string, allCells: Cell[][]): fabric.Canvas {
-  const gridHeight = allCells.length;
-  const gridWidth = allCells[0].length;
+function createCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas {
+  const gridWidth = stages[0][0].length;
+  const totalHeight = stages.reduce((acc, stage) => acc + stage.length, 0);
   
   const canvas = new fabric.Canvas("c", { selection: false });
   canvas.setWidth(gridWidth * CELL_SIZE);
-  canvas.setHeight(gridHeight * CELL_SIZE);
+  canvas.setHeight(totalHeight * CELL_SIZE);  // Adjusted height for all stages
   canvas.backgroundColor = BACKGROUND_COLOR;
   canvas.renderAll();
 
   if (!canvasCache[canvasId]) {
-    window.addEventListener('resize', () => resizeCanvas(canvas, gridWidth, gridHeight));
+    window.addEventListener('resize', () => resizeCanvas(canvas, gridWidth, totalHeight));
   }
 
-  resizeCanvas(canvas, gridWidth, gridHeight);
+  resizeCanvas(canvas, gridWidth, totalHeight);
   return canvas;
 }
 
-function showCanvas(canvasId: string) {
+function showCanvas(canvasId: string, stages: Cell[][][]) {
+  
   const canvasElement = document.getElementById(canvasId);
   if (canvasElement) {
     canvasElement.style.display = 'block';
   }
 
   if (canvasCache[canvasId]) {
-    const prop = getConfigBasedOnCanvasId(canvasId);
-    const gridWidth = prop.shape[0].length;
-    const gridHeight = prop.shape.length;
-    resizeCanvas(canvasCache[canvasId], gridWidth, gridHeight);
+    const gridWidth = stages[0][0].length;
+    const totalHeight = stages.reduce((acc, stage) => acc + stage.length, 0);
+  
+    resizeCanvas(canvasCache[canvasId], gridWidth, totalHeight);
   }
 }
 
@@ -92,22 +86,27 @@ function resizeCanvas(canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
       canvas.calcOffset();
   }
 }
-function fromWeiToMatic(weiValue) {
-  return Number(weiValue) / 10**18;
+function fromGweiToMatic(value: bigint) {
+  return Number(value) / 10**9;
 }
 
-
-export function setupCanvas(canvasId: string, allCells: Cell[][]): fabric.Canvas {
+export function setupCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas {
   displaySquareContent(false);
 
+  // For now, only use the first stage's allCells
+  const stage1 = stages[0];
+
   if (canvasCache[canvasId]) {
-    showCanvas(canvasId);
-    return canvasCache[canvasId];
+      showCanvas(canvasId, stages);
+      return canvasCache[canvasId];
   }
 
-  const prop = getConfigBasedOnCanvasId(canvasId);
-  const canvas = createCanvas(canvasId, allCells);
-  setupCanvasContent(canvas, allCells);
+  const canvas = createCanvas(canvasId, stages);
+  let yOffset = 0;
+  for (const stage of stages) {
+    setupCanvasContent(canvas, stage, yOffset);
+    yOffset += stage.length * CELL_SIZE; 
+  }
   canvasCache[canvasId] = canvas;
 
   return canvas;
@@ -120,7 +119,7 @@ function displaySquareContent(show: boolean) {
   }
 }
 
-function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][]): fabric.Canvas {
+function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: number): fabric.Canvas {
   const gridHeight = allCells.length;
   const gridWidth = allCells[0].length;
 
@@ -134,7 +133,7 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][]): fabric.C
     for (let x = 0; x < gridWidth; x++) {
       let fillColor = "#000";
       let cell = allCells[y][x];
-      let currentValue = fromWeiToMatic(cell.baseValue);
+      let currentValue = fromGweiToMatic(cell.baseValue);
       if (cell.layers.length > 0) {
         fillColor = cell.layers[cell.layers.length - 1].color;
       }
@@ -143,7 +142,7 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][]): fabric.C
           height: CELL_SIZE,
           stroke: GRID_COLOR,
           fill: fillColor,
-          top: (CELL_SIZE * y),
+          top: (CELL_SIZE * y) + yOffset,
           left: (CELL_SIZE * x),
           lockMovementX: true,
           lockMovementY: true,

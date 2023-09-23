@@ -11,6 +11,6 @@ export interface Layer {
 }
 
 export interface Cell {
-  baseValue: number; 
+  baseValue: bigint; 
   layers: Layer[];
 }

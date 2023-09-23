@@ -12,23 +12,6 @@ body, html {
   height: 100%;
 }
 
-#canvas-container {
-  flex-grow: 1;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 8px rgba(0,0,0,0.3);
-}
-
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.square-content {
-  display: none;
-}
-
 a {
   text-decoration: none;
   color: #a8a8f8;
