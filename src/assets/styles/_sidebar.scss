@@ -22,22 +22,20 @@
     }
 
     .pixel-display {
-      width: 32px;
-      height: 32px;
-      margin: 0 auto;
-      border: 2px solid $color-accent;
+      width: 4rem;
+      height: 4rem;
+      margin: 0 auto 1rem auto;
+      border: 3px solid #333;
       box-shadow: 0 2px 4px $color-shadow-light;
       transition: border 0.3s, transform 0.3s;
 
       &:hover {
-        border: 2px solid $color-accent-hover;
+        border: 3px solid #333;
         transform: scale(1.1);
       }
     }
 
     .pixel-properties {
-      text-align: center;
-      margin-top: 10px;
       color: $color-primary-light;
       p {
         margin: 5px 0;

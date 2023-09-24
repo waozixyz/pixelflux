@@ -103,7 +103,7 @@ export function setupCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas
   let yOffset = 0;
   for (const stage of stages) {
     setupCanvasContent(canvas, stage, yOffset);
-    yOffset += stage.length * CELL_SIZE; 
+    yOffset += stage.length; 
   }
   canvasCache[canvasId] = canvas;
 
@@ -136,7 +136,8 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: 
           fill: fillColor,
           gridX: x,
           gridY: y,
-          top: (CELL_SIZE * y) + yOffset,
+          yOffset: yOffset,
+          top: (CELL_SIZE * y) + (yOffset * CELL_SIZE),
           left: (CELL_SIZE * x),
           lockMovementX: true,
           lockMovementY: true,
@@ -149,14 +150,15 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: 
       square.on('mousedown', function (e) {
         if (!e.target) return;
         const clickedSquare = e.target as fabric.Rect & CustomRectOptions;
-        if (store.selectedSquare && store.selectedSquare !== e.target) {
+        if (store.selectedSquare && store.selectedSquare !== clickedSquare) {
             store.selectedSquare.set('strokeWidth', 1);
+            store.selectedSquare.set('fill', store.selectedSquare.originalFill);
         }
         e.target.set('strokeWidth', 4);
         setSelectedSquare(clickedSquare);
 
         if(!store.selectedSquare.squareValue) return;
-        updateSidebarForSelectedSquare(store.selectedSquare);
+        updateSidebarForSelectedSquare(canvas);
       });
       squares.push(square);
     }

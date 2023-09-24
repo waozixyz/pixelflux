@@ -1,5 +1,5 @@
 import { setupCanvas } from './canvasUtils';
-import { setupColorOptions, setupHistory } from './sidebar';
+import { setupColorOptions } from './sidebar';
 import { getStagesFromContracts } from './integrations';
 
 document.addEventListener("DOMContentLoaded", async () => {

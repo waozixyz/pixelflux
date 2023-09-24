@@ -6,6 +6,7 @@ export interface CustomRectOptions extends fabric.IRectOptions {
   squareLayers?: Layer[]; 
   gridX: number;
   gridY: number;
+  yOffset: number;
 }
 
 export interface Layer {

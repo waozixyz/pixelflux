@@ -13,31 +13,33 @@ export function displaySquareContent(show: boolean) {
   }
 }
 
-export function updateSidebarForSelectedSquare(selectedSquare: CustomRectOptions) {
+export function updateSidebarForSelectedSquare(canvas: fabric.Canvas) {
   displaySquareContent(true);
 
   const pixelDisplayElement = document.querySelector('.pixel-display') as HTMLElement;
-  if (pixelDisplayElement && typeof selectedSquare.fill === 'string') {
-    pixelDisplayElement.style.backgroundColor = selectedSquare.fill;
+  if (pixelDisplayElement && typeof store.selectedSquare.fill === 'string') {
+    pixelDisplayElement.style.backgroundColor = store.selectedSquare.fill ? store.selectedSquare.fill : "#000";
   }
   const pixelPropertiesElement = document.querySelector('.pixel-properties');
   if (pixelPropertiesElement) {
-    const currentLayerNumber = selectedSquare.squareLayers.length;
-    const currentLayer = currentLayerNumber > 0 ? selectedSquare.squareLayers[currentLayerNumber - 1] : null;
+    const currentLayerNumber = store.selectedSquare.squareLayers.length;
+    const currentLayer = currentLayerNumber > 0 ? store.selectedSquare.squareLayers[currentLayerNumber - 1] : null;
    
 
     pixelPropertiesElement.innerHTML = `
+      <p class="center">${store.selectedSquare.squareValue} POL</p>
+      <p class="center">x: ${store.selectedSquare.gridX} y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
+
       <p>Layer ${currentLayerNumber - 1}</p>
 
-      <p>Position: x = ${selectedSquare.gridX}, y = ${selectedSquare.gridY}</p>
-      <p>Current Value: ${selectedSquare.squareValue}</p>
       <p>Owner = ${currentLayer.owner.slice(0, 4)}...${currentLayer.owner.slice(-4)}</p>
       `;
   }
 
 
   currentPage = 1;
-  updateHistory(currentPage, selectedSquare);
+  updateHistory(currentPage);
+  setupColorOptions(canvas);
 }
 
 function createColorOption(canvas: fabric.Canvas, color: string) {
@@ -48,14 +50,22 @@ function createColorOption(canvas: fabric.Canvas, color: string) {
   colorOption.addEventListener('click', function () {
       if (store.selectedSquare !== null) {
           store.selectedSquare.set('fill', color);
-          store.selectedSquare.originalFill = color;
+          updateSidebarForSelectedSquare(canvas);
           canvas.renderAll();
       }
   });
   colorOptionsContainer.appendChild(colorOption);
 }
 
+
 export function setupColorOptions(canvas: fabric.Canvas) {
+  const colorOptionsContainer = document.getElementById('color-options')!;
+  colorOptionsContainer.innerHTML = '';
+
+  if (store.selectedSquare) {
+    createColorOption(canvas, store.selectedSquare.originalFill ? store.selectedSquare.originalFill : "#000");
+  }
+
   defaultColors.forEach(function (color: string) {
       createColorOption(canvas, color);
   });
@@ -89,7 +99,6 @@ function displayHistoryForPage(pageNumber: number, pixelData: any) {
       historyElement.appendChild(liElement);
   });
 
-  // Update the navigation buttons (previous/next) based on the current page
   const prevButton = document.getElementById('prev-button') as HTMLInputElement;
   const nextButton = document.getElementById('next-button') as HTMLInputElement;
 
@@ -99,10 +108,10 @@ function displayHistoryForPage(pageNumber: number, pixelData: any) {
   }
 }
 
-function updateHistory(currentPage: number, selectedSquare: CustomRectOptions) {
-  const pixelData = selectedSquare.squareLayers.map(layer => ({
-      color: layer.color,
-      value: selectedSquare.squareValue,
+function updateHistory(currentPage: number) {
+  const pixelData = store.selectedSquare.squareLayers.map(layer => ({
+      color: layer.color ? layer.color : "#000",
+      value: store.selectedSquare.squareValue,
       contractAddress: layer.owner
   }));
   displayHistoryForPage(currentPage, pixelData);
