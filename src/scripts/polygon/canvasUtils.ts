@@ -1,6 +1,8 @@
 import { fabric } from "fabric";
 import { CustomRectOptions, Cell } from "./interfaces";
 import { store, setSelectedSquare } from "./store";
+import { fromGweiToMatic } from "./utils";
+import { updateSidebarForSelectedSquare, displaySquareContent } from "./sidebar";
 
 const canvasCache: { [id: string]: fabric.Canvas } = {};
 const CELL_SIZE = 32;
@@ -86,10 +88,6 @@ function resizeCanvas(canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
       canvas.calcOffset();
   }
 }
-function fromGweiToMatic(value: bigint) {
-  return Number(value) / 10**9;
-}
-
 export function setupCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas {
   displaySquareContent(false);
 
@@ -112,13 +110,6 @@ export function setupCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas
   return canvas;
 }
 
-function displaySquareContent(show: boolean) {
-  const element = document.querySelector('.square-content') as HTMLElement;
-  if (element) {
-    element.style.display = show ? 'block' : 'none';
-  }
-}
-
 function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: number): fabric.Canvas {
   const gridHeight = allCells.length;
   const gridWidth = allCells[0].length;
@@ -138,10 +129,13 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: 
         fillColor = cell.layers[cell.layers.length - 1].color;
       }
       const square = new fabric.Rect({
+          squareLayers: cell.layers,
           width: CELL_SIZE,
           height: CELL_SIZE,
           stroke: GRID_COLOR,
           fill: fillColor,
+          gridX: x,
+          gridY: y,
           top: (CELL_SIZE * y) + yOffset,
           left: (CELL_SIZE * x),
           lockMovementX: true,
@@ -154,18 +148,15 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: 
 
       square.on('mousedown', function (e) {
         if (!e.target) return;
-    
+        const clickedSquare = e.target as fabric.Rect & CustomRectOptions;
         if (store.selectedSquare && store.selectedSquare !== e.target) {
             store.selectedSquare.set('strokeWidth', 1);
         }
         e.target.set('strokeWidth', 4);
-        setSelectedSquare(e.target as fabric.Rect);
-    
-        if(!store.selectedSquare.squareValue) return;
+        setSelectedSquare(clickedSquare);
 
-        displaySquareContent(true)
-        const currentValueElement = document.getElementById('current-value')!;
-        currentValueElement.textContent = store.selectedSquare.squareValue.toString();
+        if(!store.selectedSquare.squareValue) return;
+        updateSidebarForSelectedSquare(store.selectedSquare);
       });
       squares.push(square);
     }

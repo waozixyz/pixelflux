@@ -4,7 +4,7 @@ body, html {
   height: 100vh;
   color: #fff;
   font-family: Arial, sans-serif;
-  background: linear-gradient(45deg, #232335, #141414);
+  background: $color-bg-gradient;
 }
 
 #wrapper {
@@ -14,7 +14,7 @@ body, html {
 
 a {
   text-decoration: none;
-  color: #a8a8f8;
+  color: $color-accent;
   position: relative;
   transition: color 0.3s, transform 0.3s;
 
@@ -32,7 +32,7 @@ a {
   }
 
   &:hover {
-    color: #c9c9ff;
+    color: $color-accent-hover;
     transform: scale(1.05);
     &:before {
       transform: scaleX(1);
@@ -42,6 +42,6 @@ a {
 
   &:active, &:focus {
     outline: none;
-    color: #e1e1ff;
+    color: $color-accent-active;
   }
 }

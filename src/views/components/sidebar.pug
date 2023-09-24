@@ -6,11 +6,14 @@
     span#connect-text Connect Wallet
     span#address-text(style="display: none;")
       span#account-address
-
+  br
   div.square-content
-    h2 Current Value
-    p#current-value -
-    button#buy-button Buy
+    .pixel-card
+      .pixel-display(style="background-color: #PLACEHOLDER_COLOR;")
+      .pixel-properties
+        p Position: x = -, y = -
+        p Current Value: -
+      button#buy-button Buy
     h2 Color Options
     #color-options
     h2 History

@@ -1,21 +1,20 @@
-/* Styles for Buy Button */
 button, .button {
   display: block;
   margin: 15px auto;
   padding: 8px 15px;
-  background-color: #535;
+  background-color: $color-button-bg;
   border: none;
   border-radius: 5px;
-  color: #e0e0e0;
+  color: $color-button-text;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px $color-button-shadow;
   font-weight: bold;
   font-size: 16px;
 }
 
 button:hover, .button:hover {
-  background-color: #777;
+  background-color: $color-button-bg-hover;
   transform: scale(1.05);
 }
 
@@ -25,5 +24,5 @@ button:active, .button:active {
 
 button:focus, .button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #e0e0e0;
+  box-shadow: 0 0 0 2px $color-button-focus-outline;
 }

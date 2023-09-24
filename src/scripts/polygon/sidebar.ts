@@ -1,18 +1,44 @@
-import { default as defaultColors } from '../config/colors.json';
+import { default as defaultColors } from '../../config/colors.json';
 import { store } from "./store";
+import { CustomRectOptions } from './interfaces'
 
 const ITEMS_PER_PAGE = 5;
 let currentPage = 1;
 
-const mockPixelData = [
-  { color: "#FF5733", value: 85, contractAddress: "0x1234567890123456789012345678901234567890" },
-  { color: "#32a852", value: 80, contractAddress: "0x2345678901234567890123456789012345678901" },
-  { color: "#327da8", value: 75, contractAddress: "0x3456789012345678901234567890123456789012" },
-  { color: "#a83280", value: 70, contractAddress: "0x4567890123456789012345678901234567890123" },
-  { color: "#a87232", value: 65, contractAddress: "0x5678901234567890123456789012345678901234" },
-  { color: "#FF5733", value: 60, contractAddress: "0x1234567890123456789012345678901234567890" },
-  { color: "#32a852", value: 55, contractAddress: "0x2345678901234567890123456789012345678901" }
-];
+
+export function displaySquareContent(show: boolean) {
+  const element = document.querySelector('.square-content') as HTMLElement;
+  if (element) {
+    element.style.display = show ? 'block' : 'none';
+  }
+}
+
+export function updateSidebarForSelectedSquare(selectedSquare: CustomRectOptions) {
+  displaySquareContent(true);
+
+  const pixelDisplayElement = document.querySelector('.pixel-display') as HTMLElement;
+  if (pixelDisplayElement && typeof selectedSquare.fill === 'string') {
+    pixelDisplayElement.style.backgroundColor = selectedSquare.fill;
+  }
+  const pixelPropertiesElement = document.querySelector('.pixel-properties');
+  if (pixelPropertiesElement) {
+    const currentLayerNumber = selectedSquare.squareLayers.length;
+    const currentLayer = currentLayerNumber > 0 ? selectedSquare.squareLayers[currentLayerNumber - 1] : null;
+   
+
+    pixelPropertiesElement.innerHTML = `
+      <p>Layer ${currentLayerNumber - 1}</p>
+
+      <p>Position: x = ${selectedSquare.gridX}, y = ${selectedSquare.gridY}</p>
+      <p>Current Value: ${selectedSquare.squareValue}</p>
+      <p>Owner = ${currentLayer.owner.slice(0, 4)}...${currentLayer.owner.slice(-4)}</p>
+      `;
+  }
+
+
+  currentPage = 1;
+  updateHistory(currentPage, selectedSquare);
+}
 
 function createColorOption(canvas: fabric.Canvas, color: string) {
   const colorOptionsContainer = document.getElementById('color-options')!;
@@ -35,11 +61,11 @@ export function setupColorOptions(canvas: fabric.Canvas) {
   });
 }
 
-function displayHistoryForPage(pageNumber) {
+function displayHistoryForPage(pageNumber: number, pixelData: any) {
   const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
 
-  const itemsToDisplay = mockPixelData.slice(startIndex, endIndex);
+  const itemsToDisplay = pixelData.slice(startIndex, endIndex);
 
   const historyElement = document.getElementById('history')!;
   historyElement.innerHTML = '';
@@ -69,12 +95,17 @@ function displayHistoryForPage(pageNumber) {
 
   if (prevButton && nextButton) {
     prevButton.disabled = pageNumber <= 1;
-    nextButton.disabled = pageNumber >= Math.ceil(mockPixelData.length / ITEMS_PER_PAGE);
+    nextButton.disabled = pageNumber >= Math.ceil(pixelData.length / ITEMS_PER_PAGE);
   }
 }
 
-export function setupHistory() {
-  displayHistoryForPage(currentPage);
+function updateHistory(currentPage: number, selectedSquare: CustomRectOptions) {
+  const pixelData = selectedSquare.squareLayers.map(layer => ({
+      color: layer.color,
+      value: selectedSquare.squareValue,
+      contractAddress: layer.owner
+  }));
+  displayHistoryForPage(currentPage, pixelData);
 
   const prevButton = document.getElementById('prev-button');
   const nextButton = document.getElementById('next-button');
@@ -82,12 +113,12 @@ export function setupHistory() {
   if (prevButton && nextButton) {
     prevButton.addEventListener('click', () => {
       currentPage--;
-      displayHistoryForPage(currentPage);
+      displayHistoryForPage(currentPage, pixelData);
     });
 
     nextButton.addEventListener('click', () => {
       currentPage++;
-      displayHistoryForPage(currentPage);
+      displayHistoryForPage(currentPage, pixelData);
     });
   }
 }
@@ -138,25 +169,18 @@ document.addEventListener("DOMContentLoaded", async() => {
     metamaskOption.addEventListener('click', async () => {
       console.log("Connecting with MetaMask...");
   
-      // Check if MetaMask is installed
       if (typeof window.ethereum !== 'undefined') {
-  
-        // Request account access
         try {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          
-          // Check if account access is granted
           if (accounts.length > 0) {
             console.log("Account access granted.");
            
             const connectedAddress = accounts[0];
             console.log("Connected address:", connectedAddress);
-            
-            // Switch to the Polygon network
             try {
               await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x89' }],
+                params: [{ chainId: '0x539' }],
               });
               console.log("Switched to the Polygon network.");
             } catch (switchError) {
