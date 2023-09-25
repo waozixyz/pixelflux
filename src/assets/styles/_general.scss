@@ -1,12 +1,25 @@
+@font-face {
+  font-family: 'PixelScriptRegular';
+  src: url('../fonts/PixelScriptRegular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'kirbyss';
+  src: url('../fonts/kirbyss.ttf');
+}
+* {
+  font-family: 'kirbyss';
+}
 body, html {
   margin: 0;
   padding: 0;
-  height: 100vh;
   color: #fff;
-  font-family: Arial, sans-serif;
   background: $color-bg-gradient;
+  height: 100%;
 }
-
+h1, h2, h3 {
+  font-family: 'PixelScriptRegular', Arial, sans-serif;
+}
 #wrapper {
   display: flex;
   height: 100%;

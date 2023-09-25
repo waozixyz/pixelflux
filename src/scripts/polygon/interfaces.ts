@@ -18,3 +18,8 @@ export interface Cell {
   baseValue: bigint; 
   layers: Layer[];
 }
+
+export interface Stage {
+  isEnabled: boolean;
+  cells: Cell[][];
+}

@@ -3,13 +3,14 @@ import { CustomRectOptions } from "./interfaces";
 
 export interface Store {
     selectedSquare: fabric.Rect & CustomRectOptions | null ;
+    colorPicker: string[];
 }
 
 export const store: Store = {
-    selectedSquare: null
+    selectedSquare: null,
+    colorPicker: ["#FFD700", "#8B4513"]
 };
 
-// Helper functions to modify the store
 export function setSelectedSquare(square: fabric.Rect & CustomRectOptions | null ) {
     store.selectedSquare = square;
 }

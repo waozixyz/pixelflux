@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { CustomRectOptions, Cell } from "./interfaces";
+import { CustomRectOptions, Cell, Stage } from "./interfaces";
 import { store, setSelectedSquare } from "./store";
 import { fromGweiToMatic } from "./utils";
 import { updateSidebarForSelectedSquare, displaySquareContent } from "./sidebar";
@@ -9,13 +9,21 @@ const CELL_SIZE = 32;
 const GRID_COLOR = "#333";
 const BACKGROUND_COLOR = "#000";
 
-function createCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas {
-  const gridWidth = stages[0][0].length;
-  const totalHeight = stages.reduce((acc, stage) => acc + stage.length, 0);
+const STAGE2_ACTIVATION_THRESHOLD = 2000;
+const STAGE3_STAGE1_ACTIVATION_THRESHOLD = 5000;
+const STAGE3_STAGE2_ACTIVATION_THRESHOLD = 10000; 
+
+function createCanvas(canvasId: string, stages: Stage[]): fabric.Canvas {
+  const gridWidth = stages[0].cells[0].length;
+  const contentHeight = stages.reduce((acc, stage) => acc + stage.cells.length, 0);
+  const hasDisabledStage = stages.some(stage => !stage.isEnabled);
+  const addedHeightForDisabledStage = hasDisabledStage ? 6 : 0;
+  const totalHeight = contentHeight + addedHeightForDisabledStage;
   
   const canvas = new fabric.Canvas("c", { selection: false });
   canvas.setWidth(gridWidth * CELL_SIZE);
-  canvas.setHeight(totalHeight * CELL_SIZE);  // Adjusted height for all stages
+  canvas.setHeight(totalHeight * CELL_SIZE);
+
   canvas.backgroundColor = BACKGROUND_COLOR;
   canvas.renderAll();
 
@@ -27,7 +35,7 @@ function createCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas {
   return canvas;
 }
 
-function showCanvas(canvasId: string, stages: Cell[][][]) {
+function showCanvas(canvasId: string, stages: Stage[]) {
   
   const canvasElement = document.getElementById(canvasId);
   if (canvasElement) {
@@ -36,7 +44,7 @@ function showCanvas(canvasId: string, stages: Cell[][][]) {
 
   if (canvasCache[canvasId]) {
     const gridWidth = stages[0][0].length;
-    const totalHeight = stages.reduce((acc, stage) => acc + stage.length, 0);
+    const totalHeight = stages.reduce((acc, stage) => acc + stage.cells.length, 0);
   
     resizeCanvas(canvasCache[canvasId], gridWidth, totalHeight);
   }
@@ -88,11 +96,10 @@ function resizeCanvas(canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
       canvas.calcOffset();
   }
 }
-export function setupCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas {
+export function setupCanvas(canvasId: string, stages: Stage[], totalValues: any[]): fabric.Canvas {
+  console.log(stages)
+  console.log(totalValues)
   displaySquareContent(false);
-
-  // For now, only use the first stage's allCells
-  const stage1 = stages[0];
 
   if (canvasCache[canvasId]) {
       showCanvas(canvasId, stages);
@@ -101,13 +108,57 @@ export function setupCanvas(canvasId: string, stages: Cell[][][]): fabric.Canvas
 
   const canvas = createCanvas(canvasId, stages);
   let yOffset = 0;
-  for (const stage of stages) {
-    setupCanvasContent(canvas, stage, yOffset);
-    yOffset += stage.length; 
+  for (const [index, stage] of stages.entries()) {
+    if (stage.isEnabled) {
+      setupCanvasContent(canvas, stage.cells, yOffset);
+      yOffset += stage.cells.length;
+    } else {
+      setupDisabledStageContent(canvas, index, totalValues, yOffset);
+      break;
+    }
   }
+
   canvasCache[canvasId] = canvas;
 
   return canvas;
+}
+
+
+function setupDisabledStageContent(canvas: fabric.Canvas, stageIndex: number, totalValues: any[], yOffset: number): void {
+  const gridWidth = canvas.getWidth() / CELL_SIZE;
+
+  const stageLabel = new fabric.Text(`Stage ${stageIndex + 1} / 3`, {
+    left: (gridWidth * CELL_SIZE) / 2,
+    top: yOffset * CELL_SIZE + 20,
+    fontSize: 16,
+    fill: 'white',
+    originX: 'center'
+  });
+
+  const notEnabledLabel = new fabric.Text('Not yet enabled', {
+    left: (gridWidth * CELL_SIZE) / 2,
+    top: (yOffset * CELL_SIZE) + 40, 
+    fontSize: 14,
+    fill: 'red',
+    originX: 'center'
+  });
+
+  let requiredTotalValueText = "";
+  if (stageIndex === 1) {
+    requiredTotalValueText = `Requires total of Stage 1: ${STAGE2_ACTIVATION_THRESHOLD} Matic`;
+  } else if (stageIndex === 2) {
+    requiredTotalValueText = `Requires total of Stage 1: ${STAGE3_STAGE1_ACTIVATION_THRESHOLD} Matic and Stage 2: ${STAGE3_STAGE2_ACTIVATION_THRESHOLD} Matic`;
+  }
+
+  const requiredValueLabel = new fabric.Text(requiredTotalValueText, {
+    left: (gridWidth * CELL_SIZE) / 2,
+    top: (yOffset * CELL_SIZE) + 60,
+    fontSize: 14,
+    fill: 'yellow',
+    originX: 'center'
+  });
+
+  canvas.add(stageLabel, notEnabledLabel, requiredValueLabel);
 }
 
 function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: number): fabric.Canvas {

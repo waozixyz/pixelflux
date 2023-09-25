@@ -19,10 +19,16 @@ abstract contract BaseContract {
     constructor() {
         owner = msg.sender;
     }
-    
+
+    function isContractEnabled() public virtual view returns(bool);
     function getInitialValue(uint x, uint y) internal virtual view returns (uint256, string memory);
-    function getGridWidth() internal virtual view returns (uint256);
-    function getGridHeight() internal virtual view returns (uint256);
+    function getGridWidth() internal virtual pure returns (uint256);
+    function getGridHeight() internal virtual pure returns (uint256);
+
+    modifier contractEnabled() {
+        require(isContractEnabled(), "Contract is not enabled");
+        _;
+    }
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can call this function");
@@ -34,7 +40,7 @@ abstract contract BaseContract {
         _;
     }
 
-    function setLayerColor(uint x, uint y, uint256 layerIndex, string memory newColor) public validCoordinates(x, y) onlyLayerOwner(x, y, layerIndex) {
+    function setLayerColor(uint x, uint y, uint256 layerIndex, string memory newColor) public contractEnabled() validCoordinates(x, y) onlyLayerOwner(x, y, layerIndex) {
         grid[y][x].layers[layerIndex].color = newColor;
     }
 
@@ -55,10 +61,10 @@ abstract contract BaseContract {
         _;
     }
 
-    function buyLayer(uint x, uint y, string memory color) public payable validCoordinates(x, y) {
+    function buyLayer(uint x, uint y, string memory color) public payable contractEnabled() validCoordinates(x, y) {
         buyMultipleLayers(x, y, 1, color);
     }
-    function buyMultipleLayers(uint x, uint y, uint256 numLayersToAdd, string memory color) public payable validCoordinates(x, y) {
+    function buyMultipleLayers(uint x, uint y, uint256 numLayersToAdd, string memory color) public payable contractEnabled() validCoordinates(x, y) {
         initializeCell(x, y);
 
         uint256 baseValueForCell = grid[y][x].baseValue;
@@ -103,8 +109,25 @@ abstract contract BaseContract {
             }));
         }
     }
+    
+    function calculateTotalValue() public view returns (uint256) {
+        uint256 totalValue = 0;
+        uint256 width = getGridWidth();
+        uint256 height = getGridHeight();
 
-    function getCellState(uint x, uint y) public view validCoordinates(x, y) returns (uint256, string memory, uint256) {
+        for (uint y = 0; y < height; y++) {
+            for (uint x = 0; x < width; x++) {
+                Cell memory cell = grid[y][x];
+                uint256 cellValue = cell.baseValue * cell.layers.length;
+                totalValue += cellValue;
+            }
+        }
+
+        return totalValue;
+    }
+
+
+    function getCellState(uint x, uint y) public view contractEnabled() validCoordinates(x, y) returns (uint256, string memory, uint256) {
         Cell memory cell = grid[y][x];
         
         if(cell.layers.length == 0) {
@@ -114,7 +137,7 @@ abstract contract BaseContract {
         
         return (cell.baseValue, cell.layers[cell.layers.length - 1].color, cell.layers.length);
     }
-    function getAllCellStates() public view returns (Cell[][] memory) {
+    function getAllCellStates() public view contractEnabled() returns (Cell[][] memory) {
         uint256 width = getGridWidth();
         uint256 height = getGridHeight();
         Cell[][] memory allCells = new Cell[][](height);
