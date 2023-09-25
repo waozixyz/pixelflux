@@ -2,6 +2,7 @@ import { Contract, BrowserProvider } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../../config/contracts.json';
 import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
+import { getProvider } from './blockchainProvider';
 
 export async function getConnectedPolygonAccounts(): Promise<string[]> {
   if (typeof window.ethereum !== 'undefined' && window.ethereum.isConnected()) {
@@ -22,12 +23,11 @@ type StagesResult = {
 
 
 export async function getStagesFromContracts(): Promise<StagesResult> {
-  const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-  const { Pixelflux1, Pixelflux2, Pixelflux3 } = contractConfig.polygon;
+  const provider = getProvider();
+  const contractAddresses = contractConfig.polygon.Pixelflux;
   const contractABI = Pixelflux1JSON.abi;
   
   const stages = [];
-  const contractAddresses = [Pixelflux1, Pixelflux2, Pixelflux3];
   const totalValues = [];
 
   for (const address of contractAddresses) {

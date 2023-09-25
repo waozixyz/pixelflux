@@ -3,6 +3,7 @@ import { store } from "./store";
 import { convertToFullHex } from './utils'
 import { updateColorDisplay} from "./pixelCard";
 
+
 const handleLayerSliderUpdate = () => {
   const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
   const sliderValue = document.getElementById('slider-value');
@@ -32,6 +33,9 @@ const setupSliderControls = () => {
       let currentValue = parseInt(layerSlider.value);
       if (currentValue > minSliderValue) {
         layerSlider.value = (currentValue - 1).toString();
+        if(layerSlider.value === "0" && store.selectedSquare.fill !== store.selectedSquare.originalFill) {
+          store.selectedSquare.fill = store.selectedSquare.originalFill;
+        }
         handleLayerSliderUpdate();
       }
     });

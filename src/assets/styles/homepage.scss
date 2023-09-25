@@ -49,7 +49,7 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 460px;
+    width: 420px;
     padding: 2rem;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -87,13 +87,33 @@ html, body {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 620px) {
   .homepage-container .blockchain-card {
     max-width: 300px;
     padding: 1.5rem;
 
     h2 {
       font-size: 1.5rem;
+    }
+  }
+}
+@media (max-width: 420px) {
+  .homepage-container .blockchain-card {
+    max-width: 250px;
+    padding: 1.2rem;
+
+    h2 {
+      font-size: 1.2rem;
+    }
+  }
+}
+@media (max-width: 320px) {
+  .homepage-container .blockchain-card {
+    max-width: 200px;
+    padding: 1.2rem;
+    text-align:center;
+    h2 {
+      font-size: 1.2rem;
     }
   }
 }

@@ -110,7 +110,7 @@ export function setupCanvas(canvasId: string, stages: Stage[], totalValues: any[
   let yOffset = 0;
   for (const [index, stage] of stages.entries()) {
     if (stage.isEnabled) {
-      setupCanvasContent(canvas, stage.cells, yOffset);
+      setupCanvasContent(canvas, stage.cells, yOffset, index);
       yOffset += stage.cells.length;
     } else {
       setupDisabledStageContent(canvas, index, totalValues, yOffset);
@@ -161,7 +161,7 @@ function setupDisabledStageContent(canvas: fabric.Canvas, stageIndex: number, to
   canvas.add(stageLabel, notEnabledLabel, requiredValueLabel);
 }
 
-function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: number): fabric.Canvas {
+function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: number, stage: number): fabric.Canvas {
   const gridHeight = allCells.length;
   const gridWidth = allCells[0].length;
 
@@ -187,6 +187,7 @@ function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: 
           fill: fillColor,
           gridX: x,
           gridY: y,
+          stage: stage,
           yOffset: yOffset,
           top: (CELL_SIZE * y) + (yOffset * CELL_SIZE),
           left: (CELL_SIZE * x),

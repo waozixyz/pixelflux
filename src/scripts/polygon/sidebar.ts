@@ -1,5 +1,51 @@
 
 import { setupSliderControls } from './pixelBuy';
+import { Contract } from 'ethers';
+import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
+import { getProvider } from './blockchainProvider';
+import { store } from './store';
+import contractConfig from '../../config/contracts.json';
+import { showNotification, hideNotification } from '../notification';
+
+const buyLayers = async(provider: any, userAddress: string, contractAddress: string, x: number, y: number, numLayersToAdd: number, color: string) => {
+  const contract = new Contract(contractAddress, Pixelflux1JSON.abi, provider.getSigner(userAddress));
+
+  const baseValueInGwei = store.selectedSquare.squareValue;
+  const totalValueToSend = baseValueInGwei * numLayersToAdd;
+
+  if (numLayersToAdd === 1) {
+    await contract.buyLayer(x, y, color, { value: totalValueToSend.toString() });
+  } else {
+    await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString() });
+  }
+}
+
+
+const handlePurchaseClick = async() => {
+  const provider = getProvider();
+  let userAddress = '';
+  if (typeof window.ethereum !== 'undefined') {
+    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+    if (accounts.length > 0) {
+      userAddress = accounts[0];
+    }
+  }
+
+  if (!userAddress) {
+    showNotification("No user address found. Please connect to MetaMask.");
+    return;
+}
+  
+  const contractAddress = contractConfig.polygon.Pixelflux[store.selectedSquare.stage];  
+  const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
+  const numLayersToAdd = parseInt(layerSlider.value);
+  const color = (typeof store.selectedSquare.fill === 'string') ? store.selectedSquare.fill : '';
+  const x = store.selectedSquare.gridX;
+  const y = store.selectedSquare.gridY;
+
+  buyLayers(provider, userAddress, contractAddress, x, y, numLayersToAdd, color);
+}
+
 
 const showWalletModal = () => {
   const walletModal = document.getElementById('wallet-modal');
@@ -24,10 +70,19 @@ const displayConnectedAddress = (address: string) => {
 
 const setupSidebar = async() => {
   setupSliderControls();
+
+  const closeNotificationButton = document.getElementById('close-notification');
+  if (closeNotificationButton) {
+    closeNotificationButton.addEventListener('click', hideNotification);
+  }
   
   const connectButton = document.getElementById('connect-wallet');
   const closeModalButton = document.getElementById('close-modal');
   const metamaskOption = document.getElementById('metamask-option');
+  const purchaseLayerButton = document.getElementById('purchase-button') as HTMLButtonElement;
+  if (purchaseLayerButton) {
+    purchaseLayerButton.addEventListener('click', handlePurchaseClick);
+  }
 
   if (connectButton) {
     connectButton.addEventListener('click', showWalletModal);

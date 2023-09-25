@@ -21,7 +21,6 @@ const updateColorDisplay = () => {
   const arrowSpan = pixelCard.querySelector('.pixel-display-container > span') as HTMLElement;
 
   const currentLayerNumber = store.selectedSquare.squareLayers.length - 1;
-  const currentLayer = store.selectedSquare.squareLayers[currentLayerNumber];
 
   if (pixelPreview && typeof store.selectedSquare.fill === 'string') {
     pixelPreview.style.backgroundColor = store.selectedSquare.fill ? store.selectedSquare.fill : "#000";
@@ -31,8 +30,14 @@ const updateColorDisplay = () => {
     pixelCurrent.style.backgroundColor = store.selectedSquare.originalFill ? store.selectedSquare.originalFill : "#000";
   }
 
-  const layerValue = parseInt(layerSlider.value);
-  if (layerValue > 0) {
+  let layerValue = parseInt(layerSlider.value);
+  if (layerValue > 0 || store.selectedSquare.fill !== store.selectedSquare.originalFill) {
+    if (layerValue === 0) {
+      const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
+      layerSlider.value = "1";
+      handleLayerSliderUpdate();
+      layerValue = 1;
+    }
     pixelDisplayContainer.style.display = "flex";
     pixelPreview.style.display = "block";
     arrowSpan.style.display = "inline-block";
@@ -44,9 +49,6 @@ const updateColorDisplay = () => {
       <p>L ${currentLayerNumber} -> L ${newLayerNumber}</p>
       <p>${store.selectedSquare.squareValue} POL -> ${newValue} POL</p>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
-      <br />
-      <p>New Owner</p>
-      <p>${currentLayer.owner.slice(0, 4)}...${currentLayer.owner.slice(-4)}</p>
       `;
   } else {
     arrowSpan.style.display = "none";
