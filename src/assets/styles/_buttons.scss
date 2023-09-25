@@ -26,3 +26,13 @@ button:focus, .button:focus {
   outline: none;
   box-shadow: 0 0 0 2px $color-button-focus-outline;
 }
+button:disabled, .button:disabled {
+  background-color: $color-button-disabled-bg;
+  color: $color-button-disabled-text;
+  cursor: not-allowed;
+  box-shadow: none;
+  
+  &:hover, &:active {
+    transform: none;
+  }
+}

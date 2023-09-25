@@ -1,6 +1,6 @@
 #sidebar
   h1
-    a(href="/") &larr;
+    a(href="/") &lt;-
   h1 Pixelflux
   button#connect-wallet
     span#connect-text Connect Wallet
@@ -11,9 +11,17 @@
     .pixel-card
       .pixel-display(style="background-color: #PLACEHOLDER_COLOR;")
       .pixel-properties
-      h3 Select Color
+
+    .purchase-card
+      h2 Layer Purchase
       #color-options
-      button#buy-button Buy
+      br
+      div.slider-controls
+        button#decrease-btn - 
+        div#slider-value 0
+        button#increase-btn +
+      input#layer-slider(type="range" min="0" max="100" value="0")
+      button#purchase-button(disabled) Buy Layer
 
     h2 History
     ul#history
@@ -23,5 +31,4 @@
     .pagination
       button#prev-button &laquo; Prev
       button#next-button Next &raquo;
-
   br

@@ -2,7 +2,7 @@ import { fabric } from "fabric";
 import { CustomRectOptions, Cell, Stage } from "./interfaces";
 import { store, setSelectedSquare } from "./store";
 import { fromGweiToMatic } from "./utils";
-import { updateSidebarForSelectedSquare, displaySquareContent } from "./sidebar";
+import { updateSidebarForSelectedSquare, displaySquareContent } from "./pixelCard";
 
 const canvasCache: { [id: string]: fabric.Canvas } = {};
 const CELL_SIZE = 32;

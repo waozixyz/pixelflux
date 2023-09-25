@@ -38,6 +38,7 @@
     .pixel-properties {
       color: $color-primary-light;
       p {
+        text-align: center;
         margin: 5px 0;
         font-weight: 300;
       }
@@ -79,5 +80,142 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-right: 8px;
+  }
+}
+
+.purchase-card {
+  background: linear-gradient(135deg, rgba(60, 45, 80, 1) 0%, rgba(67, 52, 97, 1) 100%);
+  border: 1px solid $color-shadow-dark;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 6px $color-shadow-dark;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 10px $color-shadow-dark;
+  }
+
+  h3, h4 {
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+  
+
+  #layer-slider {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+
+
+#color-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.color-option, input[type="color"] {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%; 
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  background-color: transparent;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 50%;
+  }
+  
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+  }
+
+  &::-moz-color-swatch-wrapper {
+    border-radius: 50%;
+  }
+  
+  &::-moz-color-swatch {
+    border-radius: 50%;
+  }
+}
+/* Modern Slider Styles */
+#layer-slider {
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: $color-accent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: $color-accent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  &:hover::-webkit-slider-thumb {
+    background: $color-accent-hover;
+  }
+
+  &:hover::-moz-range-thumb {
+    background: $color-accent-hover;
+  }
+
+  &::-moz-focus-outer {
+    border: 0;
+  }
+}
+
+.slider-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  button {
+    background-color: $color-button-bg;
+    color: $color-button-text;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+    
+    &:hover {
+      background-color: $color-button-bg-hover;
+    }
+  }
+
+  div#slider-value {
+    padding: 0 10px;
   }
 }
