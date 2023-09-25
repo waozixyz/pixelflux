@@ -40,9 +40,9 @@ function displayHistoryForPage(pageNumber: number, pixelData: any) {
 }
 
 export function updateHistory(currentPage: number) {
-  const pixelData = store.selectedSquare.squareLayers.map(layer => ({
+  const pixelData = store.selectedSquare.squareLayers.map((layer, index) => ({
       color: layer.color ? layer.color : "#000",
-      value: store.selectedSquare.squareValue,
+      value: store.selectedSquare.squareValue * (store.selectedSquare.squareLayers.length - index),
       contractAddress: layer.owner
   }));
   displayHistoryForPage(currentPage, pixelData);

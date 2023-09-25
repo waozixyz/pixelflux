@@ -20,7 +20,7 @@ const updateColorDisplay = () => {
   const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
   const arrowSpan = pixelCard.querySelector('.pixel-display-container > span') as HTMLElement;
 
-  const currentLayerNumber = store.selectedSquare.squareLayers.length - 1;
+  const currentLayerNumber = store.selectedSquare.squareLayers.length;
 
   if (pixelPreview && typeof store.selectedSquare.fill === 'string') {
     pixelPreview.style.backgroundColor = store.selectedSquare.fill ? store.selectedSquare.fill : "#000";
@@ -43,11 +43,11 @@ const updateColorDisplay = () => {
     arrowSpan.style.display = "inline-block";
 
     const newLayerNumber = currentLayerNumber + layerValue;
-    const newValue = (store.selectedSquare.squareValue * (currentLayerNumber + layerValue + 1)).toFixed(2);
+    const newValue = (store.selectedSquare.squareValue * (currentLayerNumber + layerValue)).toFixed(2);
 
     pixelPropertiesElement.innerHTML = `
-      <p>L ${currentLayerNumber} -> L ${newLayerNumber}</p>
-      <p>${store.selectedSquare.squareValue} POL -> ${newValue} POL</p>
+      <p>L ${currentLayerNumber - 1} -> L ${newLayerNumber - 1}</p>
+      <p>${store.selectedSquare.squareValue  * currentLayerNumber} POL -> ${newValue} POL</p>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
       `;
   } else {
@@ -55,8 +55,8 @@ const updateColorDisplay = () => {
     pixelDisplayContainer.style.display = "flex";
     pixelPreview.style.display = "none";
     pixelPropertiesElement.innerHTML = `
-      <p>L ${currentLayerNumber}</p>
-      <p>${store.selectedSquare.squareValue} POL</p>
+      <p>L ${currentLayerNumber - 1}</p>
+      <p>${store.selectedSquare.squareValue * currentLayerNumber} POL</p>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
       `;
   }

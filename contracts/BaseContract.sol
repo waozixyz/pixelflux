@@ -67,10 +67,11 @@ abstract contract BaseContract {
     function buyMultipleLayers(uint x, uint y, uint256 numLayersToAdd, string memory color) public payable contractEnabled() validCoordinates(x, y) {
         initializeCell(x, y);
 
-        uint256 baseValueForCell = grid[y][x].baseValue;
+        uint256 baseValueForCellInGwei = grid[y][x].baseValue;
+        uint256 baseValueForCellInWei = baseValueForCellInGwei * 10**9;
         uint256 totalCost = 0;
         for (uint256 i = 0; i < numLayersToAdd; i++) {
-            totalCost += baseValueForCell + (grid[y][x].layers.length + i) * baseValueForCell;
+            totalCost += baseValueForCellInWei + (grid[y][x].layers.length - 1 + i) * baseValueForCellInWei;
         }
         require(msg.value == totalCost, "Incorrect POL sent");
 
@@ -85,14 +86,14 @@ abstract contract BaseContract {
             bool found = false;
             for (uint256 j = 0; j < i; j++) {
                 if (payoutAddresses[j] == layerOwner) {
-                    payoutAmounts[j] += baseValueForCell;
+                    payoutAmounts[j] += baseValueForCellInWei;
                     found = true;
                     break;
                 }
             }
             if (!found) {
                 payoutAddresses[i] = layerOwner;
-                payoutAmounts[i] = baseValueForCell;
+                payoutAmounts[i] = baseValueForCellInWei;
             }
         }
 
@@ -147,10 +148,8 @@ abstract contract BaseContract {
             for (uint x = 0; x < width; x++) {
                 (uint256 value, string memory color, uint256 layersCount) = getCellState(x, y);
 
-                // Set base value
                 row[x].baseValue = value;
 
-                // Set the layers
                 if (layersCount == 0) {
                     row[x].layers = new Layer[](1);
                     row[x].layers[0] = Layer({
