@@ -1,5 +1,19 @@
+@mixin card-style {
+  border: 1px solid $color-shadow-dark;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 6px $color-shadow-dark;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 10px $color-shadow-dark;
+  }
+}
+
 #sidebar {
-  width: 230px;
+  max-width: 250px;
   height: 100%;
   padding: 15px;
   box-shadow: -2px 0 5px $color-sidebar-shadow;
@@ -8,32 +22,33 @@
   color: $color-primary-light;
   background: $color-bg-gradient;
   .pixel-card {
-    background: linear-gradient(135deg, rgba(34, 34, 60, 1) 0%, rgba(47, 47, 77, 1) 100%); // Dark gradient
-    border: 1px solid $color-shadow-dark;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 6px $color-shadow-dark;
-    transition: all 0.3s;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 10px $color-shadow-dark;
-    }
-
-    .pixel-display {
-      width: 4rem;
-      height: 4rem;
+    @include card-style;
+    background: linear-gradient(135deg, rgba(34, 34, 60, 1) 0%, rgba(47, 47, 77, 1) 100%);
+    
+    .pixel-display-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       margin: 0 auto 1rem auto;
-      border: 3px solid #333;
-      box-shadow: 0 2px 4px $color-shadow-light;
-      transition: border 0.3s, transform 0.3s;
-
-      &:hover {
+      
+      .pixel-current, .pixel-preview {
+        width: 3rem;
+        height: 3rem;
         border: 3px solid #333;
-        transform: scale(1.1);
+        box-shadow: 0 2px 4px $color-shadow-light;
+        transition: border 0.3s, transform 0.3s;
+        &:hover {
+          border: 3px solid #333;
+          transform: scale(1.1);
+        }
+      }
+    
+      .pixel-preview {
+        display: none; 
+        margin-left: 0.5rem;  
       }
     }
+    
 
     .pixel-properties {
       color: $color-primary-light;
@@ -84,18 +99,8 @@
 }
 
 .purchase-card {
+  @include card-style;
   background: linear-gradient(135deg, rgba(60, 45, 80, 1) 0%, rgba(67, 52, 97, 1) 100%);
-  border: 1px solid $color-shadow-dark;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 6px $color-shadow-dark;
-  transition: all 0.3s;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 10px $color-shadow-dark;
-  }
 
   h3, h4 {
     margin-bottom: 1rem;
@@ -109,7 +114,10 @@
   }
 }
 
-
+.history-card {
+  @include card-style;
+  background: linear-gradient(135deg, rgba(66, 45, 70, 1) 0%, rgba(90, 52, 87, 1) 100%);
+}
 
 #color-options {
   display: flex;
@@ -218,4 +226,11 @@
   div#slider-value {
     padding: 0 10px;
   }
+}
+
+
+.preview-arrow {
+  font-size: 2rem;
+  vertical-align: middle;
+  margin: 0 0.5rem;
 }

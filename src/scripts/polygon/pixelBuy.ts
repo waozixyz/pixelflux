@@ -1,28 +1,38 @@
 import { default as defaultColors } from '../../config/colors.json';
 import { store } from "./store";
 import { convertToFullHex } from './utils'
-import { updateColorDisplay } from "./pixelCard";
+import { updateColorDisplay} from "./pixelCard";
+
+const handleLayerSliderUpdate = () => {
+  const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
+  const sliderValue = document.getElementById('slider-value');
+  const purchaseLayerButton = document.getElementById('purchase-button') as HTMLButtonElement;
+
+  // Update the displayed slider value
+  sliderValue.textContent = layerSlider.value; 
+
+  // Adjust the state of the purchase button
+  purchaseLayerButton.disabled = layerSlider.value === "0";
+  purchaseLayerButton.textContent = parseInt(layerSlider.value) <= 1 ? "Buy Layer" : "Buy Layers";
+
+  // Update color display
+  updateColorDisplay();
+};
 
 const setupSliderControls = () => {
   const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
   const sliderValue = document.getElementById('slider-value');
-  const purchaseLayerButton = document.getElementById('purchase-button') as HTMLButtonElement;
   const decreaseBtn = document.getElementById('decrease-btn');
   const increaseBtn = document.getElementById('increase-btn');
   const maxSliderValue = parseInt(layerSlider.max);
   const minSliderValue = parseInt(layerSlider.min);
 
-  const updatePurchaseButtonState = () => {
-    purchaseLayerButton.disabled = layerSlider.value === "0";
-    purchaseLayerButton.textContent = parseInt(layerSlider.value) <= 1 ? "Buy Layer" : "Buy Layers";
-  };
   if (decreaseBtn) {
     decreaseBtn.addEventListener('click', function() {
       let currentValue = parseInt(layerSlider.value);
       if (currentValue > minSliderValue) {
         layerSlider.value = (currentValue - 1).toString();
-        sliderValue.textContent = layerSlider.value;
-        updatePurchaseButtonState();
+        handleLayerSliderUpdate();
       }
     });
   }
@@ -33,16 +43,14 @@ const setupSliderControls = () => {
       let currentValue = parseInt(layerSlider.value);
       if (currentValue < maxSliderValue) {
         layerSlider.value = (currentValue + 1).toString();
-        sliderValue.textContent = layerSlider.value;
-        updatePurchaseButtonState();
+        handleLayerSliderUpdate();
       }
     });
   }
 
   if (layerSlider && sliderValue) {
     layerSlider.addEventListener('input', function() {
-      sliderValue.textContent = layerSlider.value; 
-      updatePurchaseButtonState();
+      handleLayerSliderUpdate();
     });
   }
 }
@@ -107,4 +115,4 @@ const setupColorOptions = (canvas: fabric.Canvas) => {
 }
 
 
-export { setupSliderControls, createColorOption, setupColorOptions };
+export { setupSliderControls, createColorOption, setupColorOptions, handleLayerSliderUpdate };

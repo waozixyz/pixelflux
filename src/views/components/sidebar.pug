@@ -9,11 +9,14 @@
   br
   div.square-content
     .pixel-card
-      .pixel-display(style="background-color: #PLACEHOLDER_COLOR;")
+      .pixel-display-container
+        .pixel-current
+        span &nbsp;-&gt;
+        .pixel-preview
       .pixel-properties
 
     .purchase-card
-      h2 Layer Purchase
+      h2 Purchase
       #color-options
       br
       div.slider-controls
@@ -22,13 +25,14 @@
         button#increase-btn +
       input#layer-slider(type="range" min="0" max="100" value="0")
       button#purchase-button(disabled) Buy Layer
-
-    h2 History
-    ul#history
-      li
-        .color-circle(style="background-color: #FF5733;")
-        .purchase-info Value: 70, Contract: 0xABC...DEF
-    .pagination
-      button#prev-button &laquo; Prev
-      button#next-button Next &raquo;
+    
+    .history-card
+      h2 History
+      ul#history
+        li
+          .color-circle(style="background-color: #FF5733;")
+          .purchase-info Value: 70, Contract: 0xABC...DEF
+      .pagination
+        button#prev-button &laquo; Prev
+        button#next-button Next &raquo;
   br
