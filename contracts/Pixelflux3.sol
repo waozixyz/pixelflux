@@ -21,8 +21,8 @@ contract Pixelflux3 is BaseContract, DataStorage3 {
     function enableContract() public onlyOwner {
         uint256 totalValue1 = baseContract1.calculateTotalValue();
         uint256 totalValue2 = baseContract2.calculateTotalValue();
-        require(totalValue1 >= 5000 * 10**9, "Not enough total value in Stage 1");
-        require(totalValue2 >= 10000 * 10**9, "Not enough total value in Stage 2");
+        require(totalValue1 >= 15000 * 10**9, "Not enough total value in Stage 1");
+        require(totalValue2 >= 20000 * 10**9, "Not enough total value in Stage 2");
         isEnabled = true;
     }
 

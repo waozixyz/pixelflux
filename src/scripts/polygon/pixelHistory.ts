@@ -11,7 +11,7 @@ function displayHistoryForPage(pageNumber: number, pixelData: any) {
   const historyElement = document.getElementById('history')!;
   historyElement.innerHTML = '';
 
-  itemsToDisplay.forEach(data => {
+  itemsToDisplay.forEach((data: any) => {
       const liElement = document.createElement('li');
 
       const colorCircle = document.createElement('div');
@@ -40,7 +40,7 @@ function displayHistoryForPage(pageNumber: number, pixelData: any) {
 }
 
 export function updateHistory(currentPage: number) {
-  const pixelData = store.selectedSquare.squareLayers.map((layer, index) => ({
+  const pixelData = [...store.selectedSquare.squareLayers].reverse().map((layer, index) => ({
       color: layer.color ? layer.color : "#000",
       value: store.selectedSquare.squareValue * (store.selectedSquare.squareLayers.length - index),
       contractAddress: layer.owner

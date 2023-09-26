@@ -3,6 +3,8 @@ import { CustomRectOptions, Cell, Stage } from "./interfaces";
 import { store, setSelectedSquare } from "./store";
 import { fromGweiToMatic } from "./utils";
 import { updateSidebarForSelectedSquare, displaySquareContent } from "./pixelCard";
+import stage2LockedImage from '../../assets/stage2_locked.jpg';
+import stage3LockedImage from '../../assets/stage3_locked.jpg';
 
 const canvasCache: { [id: string]: fabric.Canvas } = {};
 const CELL_SIZE = 32;
@@ -10,14 +12,16 @@ const GRID_COLOR = "#333";
 const BACKGROUND_COLOR = "#000";
 
 const STAGE2_ACTIVATION_THRESHOLD = 2000;
-const STAGE3_STAGE1_ACTIVATION_THRESHOLD = 5000;
-const STAGE3_STAGE2_ACTIVATION_THRESHOLD = 10000; 
+const STAGE3_STAGE1_ACTIVATION_THRESHOLD = 15000;
+const STAGE3_STAGE2_ACTIVATION_THRESHOLD = 20000; 
+
+const STAGE_DISABLED_HEIGHT = 10;
 
 function createCanvas(canvasId: string, stages: Stage[]): fabric.Canvas {
   const gridWidth = stages[0].cells[0].length;
   const contentHeight = stages.reduce((acc, stage) => acc + stage.cells.length, 0);
   const hasDisabledStage = stages.some(stage => !stage.isEnabled);
-  const addedHeightForDisabledStage = hasDisabledStage ? 6 : 0;
+  const addedHeightForDisabledStage = hasDisabledStage ? STAGE_DISABLED_HEIGHT : 0;
   const totalHeight = contentHeight + addedHeightForDisabledStage;
   
   const canvas = new fabric.Canvas("c", { selection: false });
@@ -125,40 +129,80 @@ export function setupCanvas(canvasId: string, stages: Stage[], totalValues: any[
 
 
 function setupDisabledStageContent(canvas: fabric.Canvas, stageIndex: number, totalValues: any[], yOffset: number): void {
-  const gridWidth = canvas.getWidth() / CELL_SIZE;
+  const imageUrl = stageIndex === 1 ? stage2LockedImage : stage3LockedImage;
 
-  const stageLabel = new fabric.Text(`Stage ${stageIndex + 1} / 3`, {
-    left: (gridWidth * CELL_SIZE) / 2,
-    top: yOffset * CELL_SIZE + 20,
-    fontSize: 16,
-    fill: 'white',
-    originX: 'center'
+  fabric.Image.fromURL(imageUrl, img => {
+    const scaleFactor = (STAGE_DISABLED_HEIGHT * CELL_SIZE) / img.height;
+
+    img.set({
+        left: 0,
+        top: yOffset * CELL_SIZE,
+        selectable: false,
+        scaleX: scaleFactor,
+        scaleY: scaleFactor
+    });
+
+    const overlayRect = new fabric.Rect({
+      left: -1,
+      top: img.top,
+      width: img.width * scaleFactor,
+      height: img.height * scaleFactor,
+      fill: 'rgba(0, 0, 0, 0.5)',
+      selectable: false
+    });
+
+    canvas.add(img, overlayRect);
+
+    const middleY = img.top + (img.height * scaleFactor) / 2;
+
+    const stageLabel = new fabric.Text(`STAGE ${stageIndex + 1}`, {
+        left: img.width * scaleFactor / 2,
+        top: middleY - 140,
+        fontSize: 60,
+        fill: 'white',
+        originX: 'center',
+        selectable: false
+    });
+
+    const notEnabledLabel = new fabric.Text('Locked', {
+        left: img.width * scaleFactor / 2,
+        top: middleY + 60,
+        fontSize: 60,
+        fill: 'red',
+        originX: 'center',
+        selectable: false        
+    });
+
+    let requiredTotalValueText = "";
+    const stage1Value = Math.floor(fromGweiToMatic(totalValues[0]));
+    const stage2Value = fromGweiToMatic(totalValues[1]);
+
+    const isStage1Completed = stage1Value >= STAGE2_ACTIVATION_THRESHOLD;
+    const isStage3Completed = stage1Value >= STAGE3_STAGE1_ACTIVATION_THRESHOLD && stage2Value >= STAGE3_STAGE2_ACTIVATION_THRESHOLD;
+
+    if (isStage1Completed || isStage3Completed) {
+        requiredTotalValueText = "completed";
+        notEnabledLabel.text = 'Unlocked';
+        notEnabledLabel.fill = 'green';
+    } else {
+        if (stageIndex === 1) {
+            requiredTotalValueText = `Stage 1 Total Value: ${stage1Value}/${STAGE2_ACTIVATION_THRESHOLD} Matic`;
+        } else if (stageIndex === 2) {
+            requiredTotalValueText = `Stage 1 Total Value: ${stage1Value}/${STAGE3_STAGE1_ACTIVATION_THRESHOLD} Matic, Stage 2 Total Value : ${stage2Value}/${STAGE3_STAGE2_ACTIVATION_THRESHOLD} Matic`;
+        }
+    }
+
+    const requiredValueLabel = new fabric.Text(requiredTotalValueText, {
+        left: img.width * scaleFactor / 2,
+        top: middleY - 50,
+        fontSize: 40,
+        fill: 'yellow',
+        originX: 'center',
+        selectable: false
+    });
+
+    canvas.add(stageLabel, notEnabledLabel, requiredValueLabel);
   });
-
-  const notEnabledLabel = new fabric.Text('Not yet enabled', {
-    left: (gridWidth * CELL_SIZE) / 2,
-    top: (yOffset * CELL_SIZE) + 40, 
-    fontSize: 14,
-    fill: 'red',
-    originX: 'center'
-  });
-
-  let requiredTotalValueText = "";
-  if (stageIndex === 1) {
-    requiredTotalValueText = `Requires total of Stage 1: ${STAGE2_ACTIVATION_THRESHOLD} Matic`;
-  } else if (stageIndex === 2) {
-    requiredTotalValueText = `Requires total of Stage 1: ${STAGE3_STAGE1_ACTIVATION_THRESHOLD} Matic and Stage 2: ${STAGE3_STAGE2_ACTIVATION_THRESHOLD} Matic`;
-  }
-
-  const requiredValueLabel = new fabric.Text(requiredTotalValueText, {
-    left: (gridWidth * CELL_SIZE) / 2,
-    top: (yOffset * CELL_SIZE) + 60,
-    fontSize: 14,
-    fill: 'yellow',
-    originX: 'center'
-  });
-
-  canvas.add(stageLabel, notEnabledLabel, requiredValueLabel);
 }
 
 function setupCanvasContent(canvas: fabric.Canvas, allCells: Cell[][], yOffset: number, stage: number): fabric.Canvas {

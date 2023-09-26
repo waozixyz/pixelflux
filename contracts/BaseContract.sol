@@ -15,6 +15,8 @@ abstract contract BaseContract {
     }
 
     mapping(uint => mapping(uint => Cell)) public grid;
+    mapping(address => uint256) payoutMap;
+    event LayerPurchased(address indexed buyer, uint x, uint y, uint256 numLayers, string color);
 
     constructor() {
         owner = msg.sender;
@@ -65,49 +67,41 @@ abstract contract BaseContract {
         buyMultipleLayers(x, y, 1, color);
     }
     function buyMultipleLayers(uint x, uint y, uint256 numLayersToAdd, string memory color) public payable contractEnabled() validCoordinates(x, y) {
+        require(numLayersToAdd <= 10, "Cannot buy more than 10 layers at once");
+
         initializeCell(x, y);
 
-        uint256 baseValueForCellInGwei = grid[y][x].baseValue;
-        uint256 baseValueForCellInWei = baseValueForCellInGwei * 10**9;
-        uint256 totalCost = 0;
-        for (uint256 i = 0; i < numLayersToAdd; i++) {
-            totalCost += baseValueForCellInWei + (grid[y][x].layers.length - 1 + i) * baseValueForCellInWei;
-        }
-        require(msg.value == totalCost, "Incorrect POL sent");
-
+        uint256 baseValueForCellInWei = grid[y][x].baseValue * 10**9;
         uint256 currentLayersCount = grid[y][x].layers.length;
-
-        // Optimized transfer
-        address[] memory payoutAddresses = new address[](currentLayersCount);
-        uint256[] memory payoutAmounts = new uint256[](currentLayersCount);
+        uint256 sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
+        uint256 totalCost = baseValueForCellInWei * sumOfSeries;
+        require(msg.value == totalCost, "Incorrect POL sent");
 
         for (uint256 i = 0; i < currentLayersCount; i++) {
             address layerOwner = grid[y][x].layers[i].owner;
-            bool found = false;
-            for (uint256 j = 0; j < i; j++) {
-                if (payoutAddresses[j] == layerOwner) {
-                    payoutAmounts[j] += baseValueForCellInWei;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                payoutAddresses[i] = layerOwner;
-                payoutAmounts[i] = baseValueForCellInWei;
-            }
+            payoutMap[layerOwner] += baseValueForCellInWei;
         }
 
-        for (uint256 i = 0; i < currentLayersCount; i++) {
-            if (payoutAddresses[i] != address(0)) {
-                payable(payoutAddresses[i]).transfer(payoutAmounts[i]);
-            }
-        }
+        payoutOwners(x, y);
+
 
         for (uint256 i = 0; i < numLayersToAdd; i++) {
             grid[y][x].layers.push(Layer({
                 owner: payable(msg.sender),
                 color: color
             }));
+        }
+
+        emit LayerPurchased(msg.sender, x, y, numLayersToAdd, color);
+    }
+
+    function payoutOwners(uint x, uint y) internal {
+        for (uint256 i = 0; i < grid[y][x].layers.length; i++) {
+            address layerOwner = grid[y][x].layers[i].owner;
+            if (payoutMap[layerOwner] > 0) {
+                payable(layerOwner).transfer(payoutMap[layerOwner]);
+                payoutMap[layerOwner] = 0;
+            }
         }
     }
     

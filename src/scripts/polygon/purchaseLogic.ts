@@ -6,9 +6,18 @@ import contractConfig from '../../config/contracts.json';
 import { showNotification } from '../notification';
 import { fromMaticToWei } from './utils';
 
-const gasLimit = 500000;
+const BASE_GAS = 500000;
+const GAS_PER_EXISTING_LAYER = 20000;
+const GAS_PER_NEW_LAYER = 15000;
+const BUFFER_MULTIPLIER = 1.20;
 
-
+const estimateGas = (currentLayersCount: number, numLayersToAdd: number) => {
+  return Math.ceil(
+      BASE_GAS + 
+      (GAS_PER_EXISTING_LAYER * currentLayersCount) + 
+      (GAS_PER_NEW_LAYER * numLayersToAdd)
+  ) * BUFFER_MULTIPLIER;
+}
 
 const buyLayers = async(provider: any, userAddress: string, contractAddress: string, x: number, y: number, numLayersToAdd: number, color: string) => {
   try {
@@ -16,20 +25,21 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
     const contract = new Contract(contractAddress, Pixelflux1JSON.abi, signer);
 
     const baseValueInWei = fromMaticToWei(store.selectedSquare.squareValue);
-    const totalValueToSend = baseValueInWei * numLayersToAdd;
-    console.log(totalValueToSend, numLayersToAdd)
+    let currentLayersCount = store.selectedSquare.squareLayers.length;
+    let sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
+    let totalValueToSend = baseValueInWei * sumOfSeries;
+
+    console.log(totalValueToSend, numLayersToAdd, currentLayersCount, baseValueInWei, sumOfSeries)
+    const estimatedGas = estimateGas(currentLayersCount, numLayersToAdd);
     if (numLayersToAdd === 1) {
-      //const gasEstimate = await contract.buyLayer.estimateGas([x, y, color]);
-      await contract.buyLayer(x, y, color, { value: totalValueToSend.toString(), gasLimit: gasLimit });
+      await contract.buyLayer(x, y, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
     } else {
-      //const gasEstimate = await contract.buyMultipleLayers.estimateGas([x, y, numLayersToAdd, color]);
-      await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString(), gasLimit: gasLimit });
+      await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
     }
   } catch (error) {
     console.error("Contract interaction error:", error);
   }
 }
-
 
 const handlePurchaseClick = async() => {
   const provider = getProvider();
