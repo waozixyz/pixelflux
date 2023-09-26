@@ -1,6 +1,6 @@
 import { setupCanvas } from './canvas/setup';
 import { getStagesFromContracts } from './integrations';
-import { setupSidebar } from './sidebar';
+import { setupSidebar } from './sidebar/setup';
 
 document.addEventListener("DOMContentLoaded", async () => {
   const loadingAnimation = document.getElementById('loading-animation');

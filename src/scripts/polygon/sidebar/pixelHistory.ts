@@ -1,5 +1,5 @@
-import { store } from "./store";
-import { roundToTwoSignificantFigures } from "./utils";
+import { store } from "../store";
+import { roundToTwoSignificantFigures } from "../utils";
 
 const ITEMS_PER_PAGE = 5;
 

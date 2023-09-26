@@ -1,10 +1,10 @@
 import { Contract } from 'ethers';
-import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
-import { getProvider } from './blockchainProvider';
-import { store } from './store';
-import contractConfig from '../../config/contracts.json';
-import { showNotification } from '../notification';
-import { fromMaticToWei } from './utils';
+import Pixelflux1JSON from '../../../../build/contracts/Pixelflux1.json';
+import { getProvider } from '../blockchainProvider';
+import { store } from '../store';
+import contractConfig from '../../../config/contracts.json';
+import { showNotification } from '../../notification';
+import { fromMaticToWei } from '../utils';
 import BigNumber from 'bignumber.js';
 
 

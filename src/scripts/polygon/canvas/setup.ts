@@ -6,7 +6,7 @@ import stage2LockedImage from '../../../assets/stage2_locked.jpg';
 import stage3LockedImage from '../../../assets/stage3_locked.jpg';
 import { setSelectedSquare, store } from "../store";
 import { fromGweiToMatic } from "../utils";
-import { displaySquareContent, updateSidebarForSelectedSquare } from "../pixelCard";
+import { displaySquareContent, updateSidebarForSelectedSquare } from "../sidebar/pixelCard";
 
 const getGridWidth = (stages: Stage[]) => stages[0].cells[0].length;
 const getTotalHeight = (stages: Stage[]) => {

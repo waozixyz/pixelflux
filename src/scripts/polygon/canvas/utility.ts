@@ -2,7 +2,7 @@ import { fabric } from "fabric";
 import { CustomRectOptions, Cell } from "../interfaces";
 import { store, setSelectedSquare } from "../store";
 import { fromGweiToMatic } from "../utils";
-import { updateSidebarForSelectedSquare } from "../pixelCard";
+import { updateSidebarForSelectedSquare } from "../sidebar/pixelCard";
 
 import { CANVAS_CONFIG, STAGE_THRESHOLDS } from "./config";
 

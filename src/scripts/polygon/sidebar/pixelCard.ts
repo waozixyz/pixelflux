@@ -1,5 +1,5 @@
-import { store } from "./store";
-import { convertToFullHex, roundToTwoSignificantFigures } from './utils'
+import { store } from "../store";
+import { convertToFullHex, roundToTwoSignificantFigures } from '../utils'
 import { updateHistory } from "./pixelHistory"
 import { setupColorOptions, handleLayerSliderUpdate } from "./pixelBuy"
 

@@ -1,7 +1,6 @@
-
 import { setupSliderControls } from './pixelBuy';
 import { handlePurchaseClick } from './purchaseLogic';
-import { showNotification, hideNotification } from '../notification';
+import { showNotification, hideNotification } from '../../notification';
 
 const showWalletModal = () => {
   const walletModal = document.getElementById('wallet-modal');
