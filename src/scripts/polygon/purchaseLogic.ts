@@ -11,7 +11,17 @@ const GAS_PER_EXISTING_LAYER = 20000;
 const GAS_PER_NEW_LAYER = 15000;
 const BUFFER_MULTIPLIER = 1.20;
 
-const estimateGas = (currentLayersCount: number, numLayersToAdd: number) => {
+const calculateTotalValueToSend = (numLayersToAdd: number) => {
+  const currentLayersCount = store.selectedSquare.squareLayers.length;
+  const baseValueInWei = fromMaticToWei(store.selectedSquare.squareValue);
+  let sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
+  return baseValueInWei * sumOfSeries;
+};
+
+
+const estimateGas = (numLayersToAdd: number) => {
+  const currentLayersCount = store.selectedSquare.squareLayers.length;
+
   return Math.ceil(
       BASE_GAS + 
       (GAS_PER_EXISTING_LAYER * currentLayersCount) + 
@@ -24,13 +34,9 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
     const signer = await provider.getSigner(userAddress);
     const contract = new Contract(contractAddress, Pixelflux1JSON.abi, signer);
 
-    const baseValueInWei = fromMaticToWei(store.selectedSquare.squareValue);
-    let currentLayersCount = store.selectedSquare.squareLayers.length;
-    let sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
-    let totalValueToSend = baseValueInWei * sumOfSeries;
+    const totalValueToSend = calculateTotalValueToSend(numLayersToAdd);
 
-    console.log(totalValueToSend, numLayersToAdd, currentLayersCount, baseValueInWei, sumOfSeries)
-    const estimatedGas = estimateGas(currentLayersCount, numLayersToAdd);
+    const estimatedGas = estimateGas(numLayersToAdd);
     if (numLayersToAdd === 1) {
       await contract.buyLayer(x, y, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
     } else {
@@ -67,4 +73,4 @@ const handlePurchaseClick = async() => {
 }
 
 
-export { handlePurchaseClick }
+export { handlePurchaseClick, calculateTotalValueToSend }

@@ -72,7 +72,6 @@ html, body {
       transform: scale(1.05);
     }
 
-    // To ensure text is visible against the background
     &::before {
       content: '';
       position: absolute;

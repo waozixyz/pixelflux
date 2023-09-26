@@ -1,7 +1,7 @@
 
 import { setupSliderControls } from './pixelBuy';
 import { handlePurchaseClick } from './purchaseLogic';
-import { hideNotification } from '../notification';
+import { showNotification, hideNotification } from '../notification';
 
 const showWalletModal = () => {
   const walletModal = document.getElementById('wallet-modal');
@@ -30,6 +30,13 @@ const setupSidebar = async() => {
   if (closeNotificationButton) {
     closeNotificationButton.addEventListener('click', hideNotification);
   }
+  
+  const tooltipInfo = document.getElementById('tooltip-info');
+
+  tooltipInfo.addEventListener('click', function() {
+      showNotification("Buying a layer redistributes funds to current layer owners. When you purchase multiple layers, the incremental cost for each layer can circle back to you, especially if you own existing layers.");
+  });
+  
   
   const connectButton = document.getElementById('connect-wallet');
   const closeModalButton = document.getElementById('close-modal');

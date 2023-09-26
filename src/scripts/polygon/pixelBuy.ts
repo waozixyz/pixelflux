@@ -1,24 +1,33 @@
 import { default as defaultColors } from '../../config/colors.json';
 import { store } from "./store";
-import { convertToFullHex } from './utils'
+import { convertToFullHex, fromWeiToMatic } from './utils'
 import { updateColorDisplay} from "./pixelCard";
+import { calculateTotalValueToSend } from './purchaseLogic';
 
 
 const handleLayerSliderUpdate = () => {
   const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
   const sliderValue = document.getElementById('slider-value');
   const purchaseLayerButton = document.getElementById('purchase-button') as HTMLButtonElement;
-
-  // Update the displayed slider value
   sliderValue.textContent = layerSlider.value; 
 
-  // Adjust the state of the purchase button
   purchaseLayerButton.disabled = layerSlider.value === "0";
   purchaseLayerButton.textContent = parseInt(layerSlider.value) <= 1 ? "Buy Layer" : "Buy Layers";
 
-  // Update color display
   updateColorDisplay();
+  updateTotalValueDisplay();
 };
+
+const updateTotalValueDisplay = () => {
+  const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
+  const numLayersToAdd = parseInt(layerSlider.value);
+
+  const totalValue = fromWeiToMatic(calculateTotalValueToSend(numLayersToAdd));
+  const totalValueElement = document.querySelector('#current-cost') as HTMLElement;
+  totalValueElement.innerText = `Total Cost: ${totalValue} `;
+
+};
+
 
 const setupSliderControls = () => {
   const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;

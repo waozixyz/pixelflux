@@ -1,5 +1,5 @@
 import { store } from "./store";
-import { convertToFullHex } from './utils'
+import { convertToFullHex, roundToTwoSignificantFigures } from './utils'
 import { updateHistory } from "./pixelHistory"
 import { setupColorOptions, handleLayerSliderUpdate } from "./pixelBuy"
 
@@ -43,7 +43,7 @@ const updateColorDisplay = () => {
     arrowSpan.style.display = "inline-block";
 
     const newLayerNumber = currentLayerNumber + layerValue;
-    const newValue = (store.selectedSquare.squareValue * (currentLayerNumber + layerValue)).toFixed(2);
+    const newValue = roundToTwoSignificantFigures(store.selectedSquare.squareValue * (currentLayerNumber + layerValue));
 
     pixelPropertiesElement.innerHTML = `
       <p>L ${currentLayerNumber - 1} -> L ${newLayerNumber - 1}</p>

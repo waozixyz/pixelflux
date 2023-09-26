@@ -159,6 +159,7 @@ function setupDisabledStageContent(canvas: fabric.Canvas, stageIndex: number, to
         left: img.width * scaleFactor / 2,
         top: middleY - 140,
         fontSize: 60,
+        fontFamily: 'kirbyss',
         fill: 'white',
         originX: 'center',
         selectable: false
@@ -168,6 +169,7 @@ function setupDisabledStageContent(canvas: fabric.Canvas, stageIndex: number, to
         left: img.width * scaleFactor / 2,
         top: middleY + 60,
         fontSize: 60,
+        fontFamily: 'kirbyss',
         fill: 'red',
         originX: 'center',
         selectable: false        
@@ -195,7 +197,8 @@ function setupDisabledStageContent(canvas: fabric.Canvas, stageIndex: number, to
     const requiredValueLabel = new fabric.Text(requiredTotalValueText, {
         left: img.width * scaleFactor / 2,
         top: middleY - 50,
-        fontSize: 40,
+        fontSize: 30,
+        fontFamily: 'kirbyss',
         fill: 'yellow',
         originX: 'center',
         selectable: false

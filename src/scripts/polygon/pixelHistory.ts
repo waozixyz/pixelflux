@@ -1,4 +1,5 @@
 import { store } from "./store";
+import { roundToTwoSignificantFigures } from "./utils";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -42,7 +43,7 @@ function displayHistoryForPage(pageNumber: number, pixelData: any) {
 export function updateHistory(currentPage: number) {
   const pixelData = [...store.selectedSquare.squareLayers].reverse().map((layer, index) => ({
       color: layer.color ? layer.color : "#000",
-      value: store.selectedSquare.squareValue * (store.selectedSquare.squareLayers.length - index),
+      value: roundToTwoSignificantFigures(store.selectedSquare.squareValue * (store.selectedSquare.squareLayers.length - index)),
       contractAddress: layer.owner
   }));
   displayHistoryForPage(currentPage, pixelData);
