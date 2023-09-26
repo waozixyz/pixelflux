@@ -30,6 +30,8 @@ const updateColorDisplay = () => {
     pixelCurrent.style.backgroundColor = store.selectedSquare.originalFill ? store.selectedSquare.originalFill : "#000";
   }
 
+  const currentValue = roundToTwoSignificantFigures(store.selectedSquare.squareValue * currentLayerNumber);
+
   let layerValue = parseInt(layerSlider.value);
   if (layerValue > 0 || store.selectedSquare.fill !== store.selectedSquare.originalFill) {
     if (layerValue === 0) {
@@ -47,7 +49,7 @@ const updateColorDisplay = () => {
 
     pixelPropertiesElement.innerHTML = `
       <p>L ${currentLayerNumber - 1} -> L ${newLayerNumber - 1}</p>
-      <p>${store.selectedSquare.squareValue  * currentLayerNumber} POL -> ${newValue} POL</p>
+      <p>${currentValue} POL -> ${newValue} POL</p>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
       `;
   } else {
@@ -56,7 +58,7 @@ const updateColorDisplay = () => {
     pixelPreview.style.display = "none";
     pixelPropertiesElement.innerHTML = `
       <p>L ${currentLayerNumber - 1}</p>
-      <p>${store.selectedSquare.squareValue * currentLayerNumber} POL</p>
+      <p>${currentValue} POL</p>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
       `;
   }

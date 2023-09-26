@@ -1,4 +1,4 @@
-import { setupCanvas } from './canvasUtils';
+import { setupCanvas } from './canvas/setup';
 import { getStagesFromContracts } from './integrations';
 import { setupSidebar } from './sidebar';
 
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadingAnimation.style.display = 'none';
 
   if (stages && stages.length > 0) {
-    setupCanvas("polygon", stages, totalValues);
+    setupCanvas(stages, totalValues);
     setupSidebar();
   }
 });

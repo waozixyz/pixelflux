@@ -5,6 +5,8 @@ import { store } from './store';
 import contractConfig from '../../config/contracts.json';
 import { showNotification } from '../notification';
 import { fromMaticToWei } from './utils';
+import BigNumber from 'bignumber.js';
+
 
 const BASE_GAS = 500000;
 const GAS_PER_EXISTING_LAYER = 20000;
@@ -13,11 +15,15 @@ const BUFFER_MULTIPLIER = 1.20;
 
 const calculateTotalValueToSend = (numLayersToAdd: number) => {
   const currentLayersCount = store.selectedSquare.squareLayers.length;
-  const baseValueInWei = fromMaticToWei(store.selectedSquare.squareValue);
-  let sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
-  return baseValueInWei * sumOfSeries;
-};
+  const baseValueInWei = new BigNumber(fromMaticToWei(store.selectedSquare.squareValue));
+  
+  // Calculate the sum of the series using BigNumber
+  const sumOfSeries = new BigNumber(numLayersToAdd)
+    .multipliedBy(2 * currentLayersCount + numLayersToAdd - 1)
+    .dividedBy(2);
 
+  return baseValueInWei.multipliedBy(sumOfSeries);
+};
 
 const estimateGas = (numLayersToAdd: number) => {
   const currentLayersCount = store.selectedSquare.squareLayers.length;
@@ -43,7 +49,11 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
       await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
     }
   } catch (error) {
-    console.error("Contract interaction error:", error);
+    if (error.code === 4001) {
+      console.log("User cancelled the transaction.");
+    } else {
+      console.error("Contract interaction error:", error);
+    }
   }
 }
 

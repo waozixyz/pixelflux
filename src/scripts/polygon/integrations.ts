@@ -3,15 +3,16 @@ import { Stage } from './interfaces';
 import contractConfig from '../../config/contracts.json';
 import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
 import { getProvider } from './blockchainProvider';
+import { updateCanvasCell } from './canvas/utility';
 
-export async function getConnectedPolygonAccounts(): Promise<string[]> {
+const getConnectedPolygonAccounts = async(): Promise<string[]> => {
   if (typeof window.ethereum !== 'undefined' && window.ethereum.isConnected()) {
     return await window.ethereum.request({ method: 'eth_accounts' });
   }
   return [];
 }
 
-async function getTotalValueForContract(address: string, abi: any, provider: BrowserProvider): Promise<number> {
+const getTotalValueForContract = async(address: string, abi: any, provider: BrowserProvider): Promise<number> => {
   const contract = new Contract(address, abi, provider);
   return await contract.calculateTotalValue();
 }
@@ -22,7 +23,7 @@ type StagesResult = {
 };
 
 
-export async function getStagesFromContracts(): Promise<StagesResult> {
+const getStagesFromContracts = async(): Promise<StagesResult> => {
   const provider = getProvider();
   const contractAddresses = contractConfig.polygon.Pixelflux;
   const contractABI = Pixelflux1JSON.abi;
@@ -30,9 +31,16 @@ export async function getStagesFromContracts(): Promise<StagesResult> {
   const stages = [];
   const totalValues = [];
 
-  for (const address of contractAddresses) {
+  for (const [index, address] of contractAddresses.entries()) {
     const contract = new Contract(address, contractABI, provider);
     
+    contract.on('LayerPurchased', async(buyer, x, y, numLayers, color, event) => {
+      const updatedTotalValues = await Promise.all(contractAddresses.map(address => getTotalValueForContract(address, Pixelflux1JSON.abi, provider)));
+
+      updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, updatedTotalValues)
+    });
+
+
     const isEnabled = await contract.isContractEnabled();
     const stageData = {
       isEnabled: isEnabled,
@@ -50,3 +58,6 @@ export async function getStagesFromContracts(): Promise<StagesResult> {
     totalValues: totalValues
   };
 }
+
+
+export { getStagesFromContracts, getTotalValueForContract, getConnectedPolygonAccounts }

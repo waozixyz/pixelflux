@@ -1,15 +1,21 @@
+import BigNumber from 'bignumber.js';
 
-const fromGweiToMatic = (value: bigint) => {
-  return Number(value) / 10**9;
-}
-const fromWeiToMatic = (value: number) => {
-  return Number(value) / 10**18;
-}
+const fromGweiToMatic = (value: bigint): string => {
+  const gweiValue = new BigNumber(value.toString());
+  const maticValue = gweiValue.dividedBy(new BigNumber(10).pow(9));
+  return maticValue.toString();
+};
 
-const fromMaticToWei = (value: number) => {
-  return Number(value) * 10**18;
-}
+const fromWeiToMatic = (value: BigNumber): string => {
+  const maticValue = value.dividedBy(new BigNumber(10).pow(18));
+  return maticValue.toString();
+};
 
+const fromMaticToWei = (value: number): string => {
+  const maticValue = new BigNumber(value);
+  const weiValue = maticValue.multipliedBy(new BigNumber(10).pow(18));
+  return weiValue.toString();
+};
 
 const convertToFullHex = (hex: string): string  => {
   if (hex.length === 4) { 
