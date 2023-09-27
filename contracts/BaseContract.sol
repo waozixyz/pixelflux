@@ -132,6 +132,7 @@ abstract contract BaseContract {
         
         return (cell.baseValue, cell.layers[cell.layers.length - 1].color, cell.layers.length);
     }
+
     function getAllCellStates() public view contractEnabled() returns (Cell[][] memory) {
         uint256 width = getGridWidth();
         uint256 height = getGridHeight();
@@ -160,4 +161,37 @@ abstract contract BaseContract {
         return allCells;
     }
 
+    function getTopLayerOfCell(uint x, uint y) public view contractEnabled() validCoordinates(x, y) returns (address payable, string memory) {
+        Cell memory cell = grid[y][x];
+
+        if (cell.layers.length == 0) {
+            (, string memory initialColor) = getInitialValue(x, y);
+            return (payable(owner), initialColor);
+        }
+
+        Layer memory topLayer = cell.layers[cell.layers.length - 1];
+        return (topLayer.owner, topLayer.color);
+    }
+    
+    function getAllTopLayers() public view contractEnabled() returns (address payable[][] memory, string[][] memory) {
+        uint256 width = getGridWidth();
+        uint256 height = getGridHeight();
+
+        address payable[][] memory ownersMatrix = new address payable[][](height);
+        string[][] memory colorsMatrix = new string[][](height);
+
+        for (uint y = 0; y < height; y++) {
+            address payable[] memory ownersRow = new address payable[](width);
+            string[] memory colorsRow = new string[](width);
+
+            for (uint x = 0; x < width; x++) {
+                (ownersRow[x], colorsRow[x]) = getTopLayerOfCell(x, y);
+            }
+
+            ownersMatrix[y] = ownersRow;
+            colorsMatrix[y] = colorsRow;
+        }
+
+        return (ownersMatrix, colorsMatrix);
+    }
 }

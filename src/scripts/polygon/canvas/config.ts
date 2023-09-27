@@ -6,9 +6,8 @@ export const CANVAS_CONFIG = {
 };
 export const STAGE_THRESHOLDS = {
   STAGE2_ACTIVATION: 20,
-  STAGE3_STAGE1_ACTIVATION: 15,
+  STAGE3_STAGE1_ACTIVATION: 35,
   STAGE3_STAGE2_ACTIVATION: 20
 };
 export const STAGE_DISABLED_HEIGHT = 10;
 
-export const CANVAS_CACHE: { [id: string]: fabric.Canvas } = {};

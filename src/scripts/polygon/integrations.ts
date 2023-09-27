@@ -1,9 +1,13 @@
 import { Contract, BrowserProvider } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../../config/contracts.json';
-import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
 import { getProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
+import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
+import Pixelflux2JSON from '../../../build/contracts/Pixelflux2.json';
+import Pixelflux3JSON from '../../../build/contracts/Pixelflux3.json';
+
+const contractABIs = [Pixelflux1JSON.abi, Pixelflux2JSON.abi, Pixelflux3JSON.abi];
 
 const getConnectedPolygonAccounts = async(): Promise<string[]> => {
   if (typeof window.ethereum !== 'undefined' && window.ethereum.isConnected()) {
@@ -26,30 +30,33 @@ type StagesResult = {
 const getStagesFromContracts = async(): Promise<StagesResult> => {
   const provider = getProvider();
   const contractAddresses = contractConfig.polygon.Pixelflux;
-  const contractABI = Pixelflux1JSON.abi;
   
   const stages = [];
   const totalValues = [];
 
+
   for (const [index, address] of contractAddresses.entries()) {
-    const contract = new Contract(address, contractABI, provider);
+    const contract = new Contract(address, contractABIs[index], provider);
     
-    contract.on('LayerPurchased', async(buyer, x, y, numLayers, color, event) => {
-      const updatedTotalValues = await Promise.all(contractAddresses.map(address => getTotalValueForContract(address, Pixelflux1JSON.abi, provider)));
-      updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, updatedTotalValues)
+    contract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
+      const updatedTotalValue = await getTotalValueForContract(address, contractABIs[index], provider);
+      totalValues[index] = updatedTotalValue;
+      updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, totalValues)
     });
 
-    contract.on('ContractEnabled', async(event) => {
-      recreateCanvasForContractEnabled()
-    })
+    if (index !== 0) {
+      contract.on('ContractEnabled', () => {
+        recreateCanvasForContractEnabled()
+      })
+    }
 
     const isEnabled = await contract.isContractEnabled();
     const stageData = {
       isEnabled: isEnabled,
       cells: isEnabled ? await contract.getAllCellStates() : []
     };
-    
-    const totalValue = await getTotalValueForContract(address, contractABI, provider);
+
+    const totalValue = await getTotalValueForContract(address, contractABIs[index], provider);
     totalValues.push(totalValue);
 
     stages.push(stageData);
@@ -59,7 +66,7 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
     stages: stages,
     totalValues: totalValues
   };
-}
 
+}
 
 export { getStagesFromContracts, getTotalValueForContract, getConnectedPolygonAccounts }

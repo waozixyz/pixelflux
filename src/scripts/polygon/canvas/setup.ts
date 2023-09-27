@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { CANVAS_CACHE, CANVAS_CONFIG, STAGE_DISABLED_HEIGHT } from "./config";
+import { CANVAS_CONFIG, STAGE_DISABLED_HEIGHT } from "./config";
 import { createTextLabel, generateGridImage, getRequiredTotalValueText, resizeCanvas, isStageCompleted } from './utility';
 import { Stage, CustomRectOptions, Cell } from "../interfaces";
 import stage2LockedImage from '../../../assets/stage2_locked.jpg';
@@ -20,18 +20,6 @@ const setCanvasDimensions = (canvas: fabric.Canvas, gridWidth: number, totalHeig
   canvas.setHeight(totalHeight * CANVAS_CONFIG.CELL_SIZE);
 };
 
-const showCanvas = (stages: Stage[]) => {
-  const canvasElement = document.getElementById(CANVAS_CONFIG.ID);
-  if (canvasElement) {
-    canvasElement.style.display = 'block';
-  }
-
-  if (CANVAS_CACHE[CANVAS_CONFIG.ID]) {
-    const gridWidth = getGridWidth(stages);
-    const totalHeight = getTotalHeight(stages);
-    resizeCanvas(CANVAS_CACHE[CANVAS_CONFIG.ID], gridWidth, totalHeight);
-  }
-};
 
 const createCanvas = (stages: Stage[]): fabric.Canvas => {
   const gridWidth = getGridWidth(stages);
@@ -42,9 +30,12 @@ const createCanvas = (stages: Stage[]): fabric.Canvas => {
   canvas.backgroundColor = CANVAS_CONFIG.BACKGROUND_COLOR;
   canvas.renderAll();
 
-  if (!CANVAS_CACHE[CANVAS_CONFIG.ID]) {
-    window.addEventListener('resize', () => resizeCanvas(canvas, gridWidth, totalHeight));
+  const handleResize = () => {
+    resizeCanvas(store.canvas, getGridWidth(stages), getTotalHeight(stages));
   }
+  
+  window.removeEventListener('resize', handleResize);  
+  window.addEventListener('resize', handleResize);
 
   resizeCanvas(canvas, gridWidth, totalHeight);
   return canvas;
@@ -111,11 +102,6 @@ const setupCanvasContent = (canvas: fabric.Canvas, allCells: Cell[][], yOffset: 
 const setupCanvas = (stages: Stage[], totalValues: any[]): fabric.Canvas => {
   displaySquareContent(false);
 
-  if (CANVAS_CACHE[CANVAS_CONFIG.ID]) {
-      showCanvas(stages);
-      return CANVAS_CACHE[CANVAS_CONFIG.ID];
-  }
-
   const canvas = createCanvas(stages);
   let yOffset = 0;
   for (const [index, stage] of stages.entries()) {
@@ -127,9 +113,6 @@ const setupCanvas = (stages: Stage[], totalValues: any[]): fabric.Canvas => {
       break;
     }
   }
-
-  CANVAS_CACHE[CANVAS_CONFIG.ID] = canvas;
-
   return canvas;
 }
 
@@ -168,20 +151,18 @@ const setupDisabledStageContent = (stages: Stage[], canvas: fabric.Canvas, stage
         top: middleY - 140,
         fontSize: 60,
         fill: 'white'
-      });
+      }, 'stageLabel');
 
       const notEnabledLabel = createTextLabel('Locked', {
         left: labelLeftPosition,
         top: middleY + 60,
         fontSize: 60,
         fill: 'red'
-      });
+      }, 'lockedLabel');
 
       const stage1Value = Number(fromGweiToMatic(totalValues[0]));
       const stage2Value = Number(fromGweiToMatic(totalValues[1]));
-
       const requiredTotalValueText = getRequiredTotalValueText(stageIndex, stage1Value, stage2Value);
-
       if (isStageCompleted(stageIndex, stage1Value, stage2Value)) {
           notEnabledLabel.text = 'Waiting for owner unlock';
           notEnabledLabel.fill = 'green';
@@ -192,7 +173,7 @@ const setupDisabledStageContent = (stages: Stage[], canvas: fabric.Canvas, stage
         top: middleY - 50,
         fontSize: 30,
         fill: 'yellow'
-      });
+      }, 'requiredLabel');
 
       canvas.add(stageLabel, notEnabledLabel, requiredValueLabel);
   });

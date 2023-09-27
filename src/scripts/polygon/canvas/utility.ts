@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { CustomRectOptions } from "../interfaces";
+import { CustomRectOptions, TextLabelWithId } from "../interfaces";
 import { store, setSelectedSquare } from "../store";
 import { fromGweiToMatic } from "../utils";
 import { updateSidebarForSelectedSquare } from "../sidebar/pixelCard";
@@ -54,9 +54,9 @@ const resizeCanvas = (canvas: fabric.Canvas, gridWidth: number, gridHeight: numb
   }
 }
 
-const updateCanvasCell = (buyer: string, x: number, y: number, numLayers: number, color: string, stage: number, updatedTotalValues: any[]): void => {
+const updateCanvasCell = (buyer: string, x: number, y: number, numLayers: number, color: string, stageIndex: number, updatedTotalValues: any[]): void => {
   const canvas = store.canvas;
-  const square = canvas.getObjects().find((obj: any) => obj.gridX === x && obj.gridY === y && obj.stage === stage) as fabric.Rect & CustomRectOptions;
+  const square = canvas.getObjects().find((obj: any) => obj.gridX === x && obj.gridY === y && obj.stage === stageIndex) as fabric.Rect & CustomRectOptions;
 
   if (square) {
     square.set('fill', color);
@@ -71,34 +71,38 @@ const updateCanvasCell = (buyer: string, x: number, y: number, numLayers: number
     }
     square.set('squareLayers', updatedLayers);
   
-    if (store.selectedSquare && store.selectedSquare.gridX === x && store.selectedSquare.gridY === y && store.selectedSquare.stage === stage) {
+    if (store.selectedSquare && store.selectedSquare.gridX === x && store.selectedSquare.gridY === y && store.selectedSquare.stage === stageIndex) {
       setSelectedSquare(square);
       updateSidebarForSelectedSquare(canvas);
     }
 
-    canvas.renderAll();
   }
   const stage1Value = Number(fromGweiToMatic(updatedTotalValues[0]));
   const stage2Value = Number(fromGweiToMatic(updatedTotalValues[1]));
 
-  const requiredValueLabel = canvas.getObjects().find((obj: any) => obj.type === 'text' && obj.text.includes('Total Value')) as fabric.Text;
- 
-
+  const requiredValueLabel = getTextLabelById(canvas, 'requiredLabel');
   if (requiredValueLabel) {
-    requiredValueLabel.text = getRequiredTotalValueText(stage, stage1Value, stage2Value);
-    canvas.renderAll();
+    requiredValueLabel.text = getRequiredTotalValueText(stageIndex + 1, stage1Value, stage2Value);
   }
 
+  if (isStageCompleted(stageIndex + 1, stage1Value, stage2Value)) {
+    const notEnabledLabel = getTextLabelById(canvas, 'lockedLabel');
+    notEnabledLabel.text = 'Waiting for owner unlock';
+    notEnabledLabel.fill = 'green';
+  }
+  canvas.renderAll();
 }
+
 const recreateCanvasForContractEnabled = async (): Promise<void> => {
   const canvas = store.canvas;
-
-  canvas.clear().renderAll();
-
+  canvas.clear()
+  const loadingAnimation = document.getElementById('loading-animation');
+  loadingAnimation.style.display = 'block';
   const { stages, totalValues } = await getStagesFromContracts();
-
+  loadingAnimation.style.display = 'none';
   setupCanvas(stages, totalValues);
 }
+
 const isStageCompleted = (stageIndex: number, stage1Value: number, stage2Value: number) => {
   if (stageIndex === 1) {
     return stage1Value >= STAGE_THRESHOLDS.STAGE2_ACTIVATION;
@@ -109,7 +113,7 @@ const isStageCompleted = (stageIndex: number, stage1Value: number, stage2Value: 
 }
 
 
-const getRequiredTotalValueText = (stageIndex: number, stage1Value: number, stage2Value: number) => {
+const getRequiredTotalValueText = (stageIndex: number, stage1Value: number, stage2Value: number): string => {
   if (stageIndex === 1) {
     return isStageCompleted(stageIndex, stage1Value, stage2Value) ?
       "Requirement Completed" : 
@@ -129,13 +133,24 @@ const getRequiredTotalValueText = (stageIndex: number, stage1Value: number, stag
   return "";
 }
 
-const createTextLabel = (text: string, options: fabric.ITextOptions): fabric.Text => {
+const createTextLabel = (text: string, options: fabric.ITextOptions, id?: string): fabric.Text => {
   const defaultOptions = {
       fontFamily: 'kirbyss',
       originX: 'center',
       selectable: false
   };
-  return new fabric.Text(text, { ...defaultOptions, ...options });
+
+  const textLabel: TextLabelWithId = new fabric.Text(text, { ...defaultOptions, ...options }) as TextLabelWithId;
+  if (id) {
+      textLabel.id = id;
+  }
+  return textLabel;
+}
+
+
+// 3. Provide a function to get a text label by its ID
+const getTextLabelById = (canvas: fabric.Canvas, id: string): TextLabelWithId | undefined => {
+  return canvas.getObjects().find((obj: any) => obj.type === 'text' && obj.id === id) as TextLabelWithId;
 }
 
 export { updateCanvasCell, resizeCanvas, createTextLabel, getRequiredTotalValueText, generateGridImage, recreateCanvasForContractEnabled, isStageCompleted }
