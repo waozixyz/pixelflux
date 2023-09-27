@@ -1,10 +1,11 @@
 import { fabric } from "fabric";
-import { CustomRectOptions, Cell } from "../interfaces";
+import { CustomRectOptions } from "../interfaces";
 import { store, setSelectedSquare } from "../store";
 import { fromGweiToMatic } from "../utils";
 import { updateSidebarForSelectedSquare } from "../sidebar/pixelCard";
-
+import { setupCanvas } from "./setup";
 import { CANVAS_CONFIG, STAGE_THRESHOLDS } from "./config";
+import { getStagesFromContracts } from "../integrations";
 
 const generateGridImage = (gridWidth: number, gridHeight: number): string => {
   const tempCanvas = document.createElement('canvas');
@@ -89,21 +90,42 @@ const updateCanvasCell = (buyer: string, x: number, y: number, numLayers: number
   }
 
 }
+const recreateCanvasForContractEnabled = async (): Promise<void> => {
+  const canvas = store.canvas;
+
+  canvas.clear().renderAll();
+
+  const { stages, totalValues } = await getStagesFromContracts();
+
+  setupCanvas(stages, totalValues);
+}
+const isStageCompleted = (stageIndex: number, stage1Value: number, stage2Value: number) => {
+  if (stageIndex === 1) {
+    return stage1Value >= STAGE_THRESHOLDS.STAGE2_ACTIVATION;
+  } else if (stageIndex === 2) {
+    return stage1Value >= STAGE_THRESHOLDS.STAGE3_STAGE1_ACTIVATION && stage2Value >= STAGE_THRESHOLDS.STAGE3_STAGE2_ACTIVATION;
+  }
+  return false;
+}
+
 
 const getRequiredTotalValueText = (stageIndex: number, stage1Value: number, stage2Value: number) => {
-  if (stage1Value >= STAGE_THRESHOLDS.STAGE2_ACTIVATION || 
-      (stage1Value >= STAGE_THRESHOLDS.STAGE3_STAGE1_ACTIVATION && stage2Value >= STAGE_THRESHOLDS.STAGE3_STAGE2_ACTIVATION)) {
-      return "completed";
-  }
-
   if (stageIndex === 1) {
-      return `Stage 1 Total Value: ${stage1Value}/${STAGE_THRESHOLDS.STAGE2_ACTIVATION} Matic`;
-  } 
+    return isStageCompleted(stageIndex, stage1Value, stage2Value) ?
+      "Requirement Completed" : 
+      `Stage 1 Total Value: ${stage1Value}/${STAGE_THRESHOLDS.STAGE2_ACTIVATION} Matic`;
+  } else if (stageIndex === 2) {
+    const stage1Text = isStageCompleted(1, stage1Value, 0) ? 
+      "Requirement 1 Completed" : 
+      `Stage 1 Total Value: ${stage1Value}/${STAGE_THRESHOLDS.STAGE3_STAGE1_ACTIVATION} Matic`;
 
-  if (stageIndex === 2) {
-      return `Stage 1 Total Value: ${stage1Value}/${STAGE_THRESHOLDS.STAGE3_STAGE1_ACTIVATION} Matic, Stage 2 Total Value: ${stage2Value}/${STAGE_THRESHOLDS.STAGE3_STAGE2_ACTIVATION} Matic`;
+    const stage2Text = isStageCompleted(2, stage1Value, stage2Value) ?
+      "Requirement 2 Completed" : 
+      `Stage 2 Total Value: ${stage2Value}/${STAGE_THRESHOLDS.STAGE3_STAGE2_ACTIVATION} Matic`;
+
+    return `${stage1Text}\n${stage2Text}`;
   }
-  
+
   return "";
 }
 
@@ -116,4 +138,4 @@ const createTextLabel = (text: string, options: fabric.ITextOptions): fabric.Tex
   return new fabric.Text(text, { ...defaultOptions, ...options });
 }
 
-export { updateCanvasCell, resizeCanvas, createTextLabel, getRequiredTotalValueText, generateGridImage }
+export { updateCanvasCell, resizeCanvas, createTextLabel, getRequiredTotalValueText, generateGridImage, recreateCanvasForContractEnabled, isStageCompleted }

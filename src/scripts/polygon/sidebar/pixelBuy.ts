@@ -24,7 +24,7 @@ const updateTotalValueDisplay = () => {
 
   const totalValue = fromWeiToMatic(calculateTotalValueToSend(numLayersToAdd));
   const totalValueElement = document.querySelector('#current-cost') as HTMLElement;
-  totalValueElement.innerText = `Total Cost: ${totalValue} `;
+  totalValueElement.innerText = `${totalValue} Matic`;
 
 };
 

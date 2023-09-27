@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CANVAS_CACHE, CANVAS_CONFIG, STAGE_DISABLED_HEIGHT } from "./config";
-import { createTextLabel, generateGridImage, getRequiredTotalValueText, resizeCanvas } from './utility';
+import { createTextLabel, generateGridImage, getRequiredTotalValueText, resizeCanvas, isStageCompleted } from './utility';
 import { Stage, CustomRectOptions, Cell } from "../interfaces";
 import stage2LockedImage from '../../../assets/stage2_locked.jpg';
 import stage3LockedImage from '../../../assets/stage3_locked.jpg';
@@ -123,7 +123,7 @@ const setupCanvas = (stages: Stage[], totalValues: any[]): fabric.Canvas => {
       setupCanvasContent(canvas, stage.cells, yOffset, index);
       yOffset += stage.cells.length;
     } else {
-      setupDisabledStageContent(canvas, index, totalValues, yOffset);
+      setupDisabledStageContent(stages, canvas, index, totalValues, yOffset);
       break;
     }
   }
@@ -134,8 +134,9 @@ const setupCanvas = (stages: Stage[], totalValues: any[]): fabric.Canvas => {
 }
 
 
-const setupDisabledStageContent = (canvas: fabric.Canvas, stageIndex: number, totalValues: any[], yOffset: number): void => {
+const setupDisabledStageContent = (stages: Stage[], canvas: fabric.Canvas, stageIndex: number, totalValues: any[], yOffset: number): void => {
   const imageUrl = stageIndex === 1 ? stage2LockedImage : stage3LockedImage;
+  const gridWidth = getGridWidth(stages);
 
   fabric.Image.fromURL(imageUrl, img => {
       const scaleFactor = (STAGE_DISABLED_HEIGHT * CANVAS_CONFIG.CELL_SIZE) / img.height;
@@ -160,7 +161,7 @@ const setupDisabledStageContent = (canvas: fabric.Canvas, stageIndex: number, to
       canvas.add(img, overlayRect);
 
       const middleY = img.top + (img.height * scaleFactor) / 2;
-      const labelLeftPosition = img.width * scaleFactor / 2;
+      const labelLeftPosition = gridWidth * CANVAS_CONFIG.CELL_SIZE * 0.5
 
       const stageLabel = createTextLabel(`STAGE ${stageIndex + 1}`, {
         left: labelLeftPosition,
@@ -181,8 +182,8 @@ const setupDisabledStageContent = (canvas: fabric.Canvas, stageIndex: number, to
 
       const requiredTotalValueText = getRequiredTotalValueText(stageIndex, stage1Value, stage2Value);
 
-      if (requiredTotalValueText === "completed") {
-          notEnabledLabel.text = 'Unlocked';
+      if (isStageCompleted(stageIndex, stage1Value, stage2Value)) {
+          notEnabledLabel.text = 'Waiting for owner unlock';
           notEnabledLabel.fill = 'green';
       }
 

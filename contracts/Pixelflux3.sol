@@ -9,6 +9,8 @@ contract Pixelflux3 is BaseContract, DataStorage3 {
     BaseContract public baseContract1;
     BaseContract public baseContract2;
 
+    event ContractEnabled();
+
     function isContractEnabled() public override view returns(bool) {
         return isEnabled;
     }
@@ -21,9 +23,11 @@ contract Pixelflux3 is BaseContract, DataStorage3 {
     function enableContract() public onlyOwner {
         uint256 totalValue1 = baseContract1.calculateTotalValue();
         uint256 totalValue2 = baseContract2.calculateTotalValue();
-        require(totalValue1 >= 15000 * 10**9, "Not enough total value in Stage 1");
-        require(totalValue2 >= 20000 * 10**9, "Not enough total value in Stage 2");
+        require(totalValue1 >= 15 * 10**9, "Not enough total value in Stage 1");
+        require(totalValue2 >= 20 * 10**9, "Not enough total value in Stage 2");
         isEnabled = true;
+        
+        emit ContractEnabled();
     }
 
     function getInitialValue(uint x, uint y) internal override view returns (uint256, string memory) {

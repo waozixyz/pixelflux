@@ -11,10 +11,15 @@
     box-shadow: 0 6px 10px $color-shadow-dark;
   }
 }
-
+#current-cost-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
 #sidebar {
-  max-width: 250px;
-  min-width: 250px;
+  max-width: 230px;
+  min-width: 230px;
   height: 100%;
   padding: 15px;
   box-shadow: -2px 0 5px $color-sidebar-shadow;
@@ -22,6 +27,9 @@
   border-radius: 0 10px 10px 0;
   color: $color-primary-light;
   background: $color-bg-gradient;
+  .square-content {
+    flex-direction: column
+  }
   .pixel-card {
     @include card-style;
     background: linear-gradient(135deg, rgba(34, 34, 60, 1) 0%, rgba(47, 47, 77, 1) 100%);
@@ -47,6 +55,16 @@
       .pixel-preview {
         display: none; 
         margin-left: 0.5rem;  
+
+        background-color: rgba($color-accent, 0.1);
+        border: 1px solid $color-accent;
+        transition: all 0.3s;
+      
+        border-color: $color-accent; 
+        &:hover {
+          border-color: $color-accent-hover;
+        }
+      
       }
     }
     
@@ -65,25 +83,6 @@
 #sidebar h1 {
   text-align: center;
   margin-bottom: 20px; 
-}
-
-#sidebar::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background-color: $color-scrollbar-track;
-}
-
-#sidebar::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: $color-scrollbar-thumb;
-  border: 2px solid $color-scrollbar-thumb-border;
-}
-
-#sidebar::-webkit-scrollbar {
-  width: 10px;
-}
-
-#sidebar::-webkit-scrollbar-thumb:hover {
-  background-color: $color-scrollbar-thumb-hover;
 }
 
 #address-text {
@@ -228,3 +227,23 @@
     padding: 0 10px;
   }
 }
+
+
+.new-value, #current-cost {
+  background-color: rgba($color-accent, 0.1);
+  border: 1px solid $color-accent;
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: rgba($color-accent-hover, 0.2);
+    border-color: $color-accent-hover;
+    transform: translateY(-2px); 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  font-weight: 500; 
+  color: $color-accent; 
+}
+

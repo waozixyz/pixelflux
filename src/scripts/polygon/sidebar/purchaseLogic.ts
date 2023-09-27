@@ -49,7 +49,7 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
       await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
     }
   } catch (error) {
-    if (error.code === 4001) {
+    if (error.info.error.code === 4001) {
       console.log("User cancelled the transaction.");
     } else {
       console.error("Contract interaction error:", error);

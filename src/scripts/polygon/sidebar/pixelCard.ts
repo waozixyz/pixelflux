@@ -8,7 +8,7 @@ let currentPage = 1;
 const displaySquareContent = (show: boolean) => {
   const element = document.querySelector('.square-content') as HTMLElement;
   if (element) {
-    element.style.display = show ? 'block' : 'none';
+    element.style.display = show ? 'flex' : 'none';
   }
 }
 const updateColorDisplay = () => {
@@ -48,8 +48,12 @@ const updateColorDisplay = () => {
     const newValue = roundToTwoSignificantFigures(store.selectedSquare.squareValue * (currentLayerNumber + layerValue));
 
     pixelPropertiesElement.innerHTML = `
-      <p>L ${currentLayerNumber - 1} -> L ${newLayerNumber - 1}</p>
-      <p>${currentValue} POL -> ${newValue} POL</p>
+      <p>L ${currentLayerNumber - 1} ->  <span class="new-value">L ${newLayerNumber - 1}</span</p>
+      <br/>
+      <p>${currentValue} Matic</p>
+      <p>&#x2B07;</p>
+      <p class="new-value">${newValue} Matic</p>
+      <br/>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
       `;
   } else {
@@ -58,7 +62,7 @@ const updateColorDisplay = () => {
     pixelPreview.style.display = "none";
     pixelPropertiesElement.innerHTML = `
       <p>L ${currentLayerNumber - 1}</p>
-      <p>${currentValue} POL</p>
+      <p>${currentValue} Matic</p>
       <p>x: ${store.selectedSquare.gridX}, y: ${store.selectedSquare.gridY + store.selectedSquare.yOffset}</p>
       `;
   }

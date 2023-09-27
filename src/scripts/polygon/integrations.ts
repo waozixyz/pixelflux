@@ -3,7 +3,7 @@ import { Stage } from './interfaces';
 import contractConfig from '../../config/contracts.json';
 import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
 import { getProvider } from './blockchainProvider';
-import { updateCanvasCell } from './canvas/utility';
+import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 
 const getConnectedPolygonAccounts = async(): Promise<string[]> => {
   if (typeof window.ethereum !== 'undefined' && window.ethereum.isConnected()) {
@@ -36,10 +36,12 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
     
     contract.on('LayerPurchased', async(buyer, x, y, numLayers, color, event) => {
       const updatedTotalValues = await Promise.all(contractAddresses.map(address => getTotalValueForContract(address, Pixelflux1JSON.abi, provider)));
-
       updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, updatedTotalValues)
     });
 
+    contract.on('ContractEnabled', async(event) => {
+      recreateCanvasForContractEnabled()
+    })
 
     const isEnabled = await contract.isContractEnabled();
     const stageData = {
