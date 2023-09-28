@@ -1,13 +1,9 @@
 import { Contract, BrowserProvider } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../../config/contracts.json';
-import { getProvider } from './blockchainProvider';
+import { getProvider, contractABIs } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
-import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
-import Pixelflux2JSON from '../../../build/contracts/Pixelflux2.json';
-import Pixelflux3JSON from '../../../build/contracts/Pixelflux3.json';
 
-const contractABIs = [Pixelflux1JSON.abi, Pixelflux2JSON.abi, Pixelflux3JSON.abi];
 
 const getConnectedPolygonAccounts = async(): Promise<string[]> => {
   if (typeof window.ethereum !== 'undefined' && window.ethereum.isConnected()) {

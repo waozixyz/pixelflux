@@ -68,7 +68,7 @@ const setupSidebar = async() => {
             try {
               await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x539' }],
+                params: [{ chainId: '0x89' }],
               });
               console.log("Switched to the Polygon network.");
             } catch (switchError) {
