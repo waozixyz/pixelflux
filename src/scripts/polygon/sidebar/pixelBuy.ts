@@ -82,8 +82,7 @@ const createColorOption = (canvas: fabric.Canvas, color: string, isPicker?: bool
       }
   
       element.addEventListener('click', handleEvent);
-      element.addEventListener('input', handleEvent);
-      element.addEventListener('change', handleEvent);      
+      element.addEventListener('change', handleEvent);
       
       colorOptionsContainer.appendChild(element);
   } else if (!isPicker) {
