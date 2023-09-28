@@ -27,7 +27,6 @@ const convertToFullHex = (hex: string): string  => {
   return hex;
 }
 
-
 const roundToTwoSignificantFigures = (num: number): number => {
   if (num === 0) {
       return 0;

@@ -74,7 +74,48 @@ const updateColorDisplay = () => {
     colorPickers[1].value = convertToFullHex(store.colorPicker[1]);
   }
 };
+let isCloseButtonEventAdded = false;
 
+
+const handleModalDisplay = () => {
+  const sidebar = document.getElementById('sidebar');
+  const closeButton = sidebar.querySelector('#close-modal');
+
+  if (closeButton && !isCloseButtonEventAdded) {
+    closeButton.addEventListener('click', () => {
+      console.log('hi')
+      sidebar.style.display = "none";
+    });
+    isCloseButtonEventAdded = true;
+}
+
+  
+  const useModal = (): boolean => window.innerWidth <= 520;
+
+  if (useModal()) {
+    if (!sidebar.classList.contains('modal-content')) {
+      sidebar.classList.add('modal-content');
+    }
+  } else {
+    if (sidebar.classList.contains('modal-content')) {
+      sidebar.classList.remove('modal-content');
+    }
+  }
+};
+
+
+window.addEventListener('resize', () => {
+  const sidebar = document.getElementById('sidebar');
+
+  if (window.innerWidth <= 520 && !sidebar.classList.contains('modal-content')) {
+    sidebar.style.display = "none";
+  }
+  else if (window.innerWidth >= 520 && sidebar.classList.contains('modal-content')) {
+    sidebar.style.display = "block";
+
+  }
+  handleModalDisplay();
+});
 
 const updateSidebarForSelectedSquare = (canvas: fabric.Canvas) => {
   displaySquareContent(true);
@@ -86,5 +127,10 @@ const updateSidebarForSelectedSquare = (canvas: fabric.Canvas) => {
   currentPage = 1;
   updateHistory(currentPage);
   setupColorOptions(canvas);
+
+  handleModalDisplay();
+  const sidebar = document.getElementById('sidebar');
+  sidebar.style.display = "block";
 }
+
 export { updateSidebarForSelectedSquare, updateColorDisplay, displaySquareContent }

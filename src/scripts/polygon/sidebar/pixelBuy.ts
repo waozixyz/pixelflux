@@ -28,7 +28,6 @@ const updateTotalValueDisplay = () => {
 
 };
 
-
 const setupSliderControls = () => {
   const layerSlider = document.getElementById('layer-slider') as HTMLInputElement;
   const sliderValue = document.getElementById('slider-value');
@@ -49,7 +48,6 @@ const setupSliderControls = () => {
       }
     });
   }
-
 
   if (increaseBtn) {
     increaseBtn.addEventListener('click', function() {
@@ -75,19 +73,17 @@ const createColorOption = (canvas: fabric.Canvas, color: string, isPicker?: bool
       const element = document.createElement('input');
       element.type = 'color';
       element.value = convertToFullHex(store.colorPicker[pickerIndex]);
-      element.addEventListener('click', () => {
-        setColorAndUpdateSidebar(canvas, element.value);
-      });
 
-      element.addEventListener('input', () => {
-        store.colorPicker[pickerIndex] = element.value
+      const handleEvent = (event: Event) => {
+        if (event.type === 'input' || event.type === 'change') {
+            store.colorPicker[pickerIndex] = element.value;
+        }
         setColorAndUpdateSidebar(canvas, element.value);
-      });
-
-      element.addEventListener('change', () => {
-          store.colorPicker[pickerIndex] = element.value
-          setColorAndUpdateSidebar(canvas, element.value);
-      });
+      }
+  
+      element.addEventListener('click', handleEvent);
+      element.addEventListener('input', handleEvent);
+      element.addEventListener('change', handleEvent);      
       
       colorOptionsContainer.appendChild(element);
   } else if (!isPicker) {
@@ -101,7 +97,6 @@ const createColorOption = (canvas: fabric.Canvas, color: string, isPicker?: bool
   }
 }
 
-
 const setColorAndUpdateSidebar = (canvas: fabric.Canvas, color: string) => {
   if (store.selectedSquare !== null) {
       store.selectedSquare.set('fill', color);
@@ -109,7 +104,6 @@ const setColorAndUpdateSidebar = (canvas: fabric.Canvas, color: string) => {
       canvas.renderAll();
   }
 }
-
 
 const setupColorOptions = (canvas: fabric.Canvas) => {
   const colorOptionsContainer = document.getElementById('color-options')!;
