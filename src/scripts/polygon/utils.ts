@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 
 const fromGweiToMatic = (value: bigint): string => {
+  if (!value) return
   const gweiValue = new BigNumber(value.toString());
   const maticValue = gweiValue.dividedBy(new BigNumber(10).pow(9));
   return maticValue.toString();

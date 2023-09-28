@@ -1,5 +1,5 @@
 import { Contract } from 'ethers';
-import { getProvider, contractABIs } from '../blockchainProvider';
+import { getBrowserProvider, contractABIs } from '../blockchainProvider';
 import { store } from '../store';
 import contractConfig from '../../../config/contracts.json';
 import { showNotification } from '../../notification';
@@ -56,7 +56,7 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
 }
 
 const handlePurchaseClick = async() => {
-  const provider = getProvider();
+  const provider = getBrowserProvider();
   let userAddress = '';
   if (typeof window.ethereum !== 'undefined') {
     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
@@ -66,7 +66,7 @@ const handlePurchaseClick = async() => {
   }
 
   if (!userAddress) {
-    showNotification("No user address found. Please connect to MetaMask.");
+    showNotification("No user address found. Please connect to a wallet.");
     return;
 }
   

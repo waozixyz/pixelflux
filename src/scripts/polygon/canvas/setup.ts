@@ -8,7 +8,7 @@ import { setSelectedSquare, store } from "../store";
 import { fromGweiToMatic } from "../utils";
 import { displaySquareContent, updateSidebarForSelectedSquare } from "../sidebar/pixelCard";
 
-const getGridWidth = (stages: Stage[]) => stages[0].cells[0].length;
+const getGridWidth = (stages: Stage[]) => stages[0]?.cells[0]?.length || 0;
 const getTotalHeight = (stages: Stage[]) => {
   const contentHeight = stages.reduce((acc, stage) => acc + stage.cells.length, 0);
   const hasDisabledStage = stages.some(stage => !stage.isEnabled);

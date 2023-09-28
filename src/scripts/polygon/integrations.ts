@@ -1,7 +1,7 @@
-import { Contract, BrowserProvider } from 'ethers';
+import { Contract, JsonRpcProvider, WebSocketProvider } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../../config/contracts.json';
-import { getProvider, contractABIs } from './blockchainProvider';
+import { getJsonProvider, contractABIs, getWebsocketProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 
 
@@ -12,11 +12,6 @@ const getConnectedPolygonAccounts = async(): Promise<string[]> => {
   return [];
 }
 
-const getTotalValueForContract = async(address: string, abi: any, provider: BrowserProvider): Promise<number> => {
-  const contract = new Contract(address, abi, provider);
-  return await contract.calculateTotalValue();
-}
-
 type StagesResult = {
   stages: Stage[];
   totalValues: number[];
@@ -24,7 +19,8 @@ type StagesResult = {
 
 
 const getStagesFromContracts = async(): Promise<StagesResult> => {
-  const provider = getProvider();
+  const jsonProvider = getJsonProvider();
+  const wssProvider = getWebsocketProvider();
   const contractAddresses = contractConfig.polygon.Pixelflux;
   
   const stages = [];
@@ -38,27 +34,33 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
   loading.style.display = "block"
 
   for (const [index, address] of contractAddresses.entries()) {
-    const contract = new Contract(address, contractABIs[index], provider);
+    const wssContract = new Contract(address, contractABIs[index], wssProvider);
+    const jsonContract = new Contract(address, contractABIs[index], jsonProvider);
     
-    contract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
-      const updatedTotalValue = await getTotalValueForContract(address, contractABIs[index], provider);
+    wssContract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
+      const updatedTotalValue = await jsonContract.calculateTotalValue();
       totalValues[index] = updatedTotalValue;
       updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, totalValues)
     });
 
     if (index !== 0) {
-      contract.on('ContractEnabled', () => {
-        recreateCanvasForContractEnabled()
-      })
+      try {
+        wssContract.on('ContractEnabled', () => {
+          recreateCanvasForContractEnabled()
+        })
+      } catch (error) {
+        console.log('contract on failed:', error)
+      }
     }
-
-    const isEnabled = await contract.isContractEnabled();
+    const isEnabled = await jsonContract.isContractEnabled();
+    
     const stageData = {
       isEnabled: isEnabled,
-      cells: isEnabled ? await contract.getAllCellStates() : []
+      cells: isEnabled ? await jsonContract.getAllCellStates() : []
     };
 
-    const totalValue = await getTotalValueForContract(address, contractABIs[index], provider);
+    const totalValue = await jsonContract.calculateTotalValue();
+
     totalValues.push(totalValue);
 
     const progressPercentage = ((index + 1) / contractAddresses.length) * 100;
@@ -78,4 +80,4 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
 
 }
 
-export { getStagesFromContracts, getTotalValueForContract, getConnectedPolygonAccounts }
+export { getStagesFromContracts, getConnectedPolygonAccounts }
