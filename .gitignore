@@ -51,5 +51,4 @@ web_modules/
 .cache
 .parcel-cache
 
-build
 dist
