@@ -87,8 +87,10 @@ const updateCanvasCell = (buyer: string, x: number, y: number, numLayers: number
 
   if (isStageCompleted(stageIndex + 1, stage1Value, stage2Value)) {
     const notEnabledLabel = getTextLabelById(canvas, 'lockedLabel');
-    notEnabledLabel.text = 'Waiting for owner unlock';
-    notEnabledLabel.fill = 'green';
+    if (notEnabledLabel) {
+      notEnabledLabel.text = 'Waiting for owner unlock';
+      notEnabledLabel.fill = 'green';
+    }
   }
   canvas.renderAll();
 }
@@ -96,10 +98,7 @@ const updateCanvasCell = (buyer: string, x: number, y: number, numLayers: number
 const recreateCanvasForContractEnabled = async (): Promise<void> => {
   const canvas = store.canvas;
   canvas.clear()
-  const loadingAnimation = document.getElementById('loading-animation');
-  loadingAnimation.style.display = 'block';
   const { stages, totalValues } = await getStagesFromContracts();
-  loadingAnimation.style.display = 'none';
   setupCanvas(stages, totalValues);
 }
 

@@ -83,7 +83,6 @@ const handleModalDisplay = () => {
 
   if (closeButton && !isCloseButtonEventAdded) {
     closeButton.addEventListener('click', () => {
-      console.log('hi')
       sidebar.style.display = "none";
     });
     isCloseButtonEventAdded = true;

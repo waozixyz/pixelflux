@@ -24,6 +24,7 @@
   padding: 15px;
   box-shadow: -2px 0 5px $color-sidebar-shadow;
   overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 0 10px 10px 0;
   color: $color-primary-light;
   background: $color-bg-gradient;

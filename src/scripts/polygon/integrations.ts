@@ -34,6 +34,12 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
   const stages = [];
   const totalValues = [];
 
+  const loading = document.getElementById('loading')
+  const progressBar = document.getElementById('progress-bar')
+  const progressFill = progressBar.querySelector('.progress-fill') as HTMLElement;
+  const loadingText = document.getElementById('loading-text');
+
+  loading.style.display = "block"
 
   for (const [index, address] of contractAddresses.entries()) {
     const contract = new Contract(address, contractABIs[index], provider);
@@ -59,9 +65,16 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
     const totalValue = await getTotalValueForContract(address, contractABIs[index], provider);
     totalValues.push(totalValue);
 
+    const progressPercentage = ((index + 1) / contractAddresses.length) * 100;
+    progressFill.style.width = `${progressPercentage}%`;
+    loadingText.textContent = `Loading stage ${index + 1} of ${contractAddresses.length}...`;
+
+
     stages.push(stageData);
   }
 
+  loading.style.display = "none"
+  
   return {
     stages: stages,
     totalValues: totalValues

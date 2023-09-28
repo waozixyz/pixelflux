@@ -12,9 +12,14 @@ block content
   #wrapper 
     include ../components/sidebar.pug
     #canvas-container
-      #loading-animation.loader
+      #loading 
+        #loading-animation.loader
+        br
+        #progress-bar
+          .progress-fill
+        #loading-text Loading...
       canvas#c
-      
+
   include ../components/notification.pug
 
   script(type="module" src="../../scripts/polygon/index.ts")
