@@ -1,6 +1,6 @@
 import { Contract, JsonRpcProvider, WebSocketProvider } from 'ethers';
 import { Stage } from './interfaces';
-import contractConfig from '../../config/contracts.json';
+import contractConfig from '../config/contracts.json';
 import { getJsonProvider, contractABIs, getWebsocketProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 

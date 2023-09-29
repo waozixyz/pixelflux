@@ -1,8 +1,8 @@
 import { BrowserProvider, JsonRpcProvider, WebSocketProvider } from 'ethers';
 
-import Pixelflux1JSON from '../../../build/contracts/Pixelflux1.json';
-import Pixelflux2JSON from '../../../build/contracts/Pixelflux2.json';
-import Pixelflux3JSON from '../../../build/contracts/Pixelflux3.json';
+import Pixelflux1JSON from '../../build/contracts/Pixelflux1.json';
+import Pixelflux2JSON from '../../build/contracts/Pixelflux2.json';
+import Pixelflux3JSON from '../../build/contracts/Pixelflux3.json';
 
 require('dotenv').config();
 
@@ -22,18 +22,18 @@ const getJsonProvider = (): JsonRpcProvider | null => {
   }
   return new JsonRpcProvider(infuraUrl);
 }
-const getWebsocketProvider = (): WebSocketProvider | null => {
+const getWebsocketProvider = (): JsonRpcProvider | null => {
+  const infuraUrl = `wss://polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`;
   if (!process.env.INFURA_API_KEY) {
     console.error('Infura API key is required.');
     return null;
   }
-  const infuraWsUrl = `wss://polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`;
-  return new WebSocketProvider(infuraWsUrl);
+  return new JsonRpcProvider(infuraUrl);
 }
 
- 
+
  
 const contractABIs = [Pixelflux1JSON.abi, Pixelflux2JSON.abi, Pixelflux3JSON.abi];
 
 
-export {contractABIs, getBrowserProvider, getWebsocketProvider, getJsonProvider }
+export {contractABIs, getBrowserProvider, getJsonProvider, getWebsocketProvider }

@@ -1,8 +1,8 @@
 import { Contract } from 'ethers';
 import { getBrowserProvider, contractABIs } from '../blockchainProvider';
 import { store } from '../store';
-import contractConfig from '../../../config/contracts.json';
-import { showNotification } from '../../notification';
+import contractConfig from '../../config/contracts.json';
+import { showNotification } from '../notification';
 import { fromMaticToWei } from '../utils';
 import BigNumber from 'bignumber.js';
 

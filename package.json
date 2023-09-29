@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "parcel src/views/pages/*.pug",
-    "build": "parcel build src/views/pages/*.pug"
+    "start": "parcel src/views/index.pug",
+    "build": "parcel build src/views/index.pug"
   },
   "keywords": [],
   "author": "",
