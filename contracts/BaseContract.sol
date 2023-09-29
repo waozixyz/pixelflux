@@ -76,10 +76,13 @@ abstract contract BaseContract {
         uint256 sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
         uint256 totalCost = baseValueForCellInWei * sumOfSeries;
         require(msg.value == totalCost, "Incorrect POL sent");
-
-        for (uint256 i = 0; i < currentLayersCount; i++) {
-            address layerOwner = grid[y][x].layers[i].owner;
-            payoutMap[layerOwner] += baseValueForCellInWei;
+        
+        for (uint256 i = 0; i < numLayersToAdd; i++) {
+            for (uint256 j = 0; j < currentLayersCount; j++) {
+                address layerOwner = grid[y][x].layers[j].owner;
+                payoutMap[layerOwner] += baseValueForCellInWei;
+            }
+            currentLayersCount++;
         }
 
         payoutOwners(x, y);
@@ -193,5 +196,11 @@ abstract contract BaseContract {
         }
 
         return (ownersMatrix, colorsMatrix);
+    }
+
+    function withdrawFunds() external onlyOwner {
+        uint256 contractBalance = address(this).balance;
+        require(contractBalance > 0, "No funds to withdraw");
+        payable(owner).transfer(contractBalance);
     }
 }
