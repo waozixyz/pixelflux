@@ -1,7 +1,7 @@
 import { Contract, JsonRpcProvider, WebSocketProvider } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../config/contracts.json';
-import { getJsonProvider, contractABIs, getWebsocketProvider } from './blockchainProvider';
+import { getProvider, contractABIs, getWebsocketProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 
 
@@ -19,8 +19,26 @@ type StagesResult = {
 
 
 const getStagesFromContracts = async(): Promise<StagesResult> => {
-  const jsonProvider = getJsonProvider();
-  const wssProvider = getWebsocketProvider();
+  const provider = await getProvider();
+
+  if (!provider) {
+    throw new Error('Failed to get a provider.');
+  }
+
+  let wssProvider
+  try {
+    wssProvider = getWebsocketProvider();
+  } catch (error) {
+    console.error('Error creating WebSocketProvider:', error);
+  }
+  
+  await wssProvider.getNetwork().then(network => {
+    console.log("wss:", network);
+  }).catch(error => {
+      console.error('Error getting network:', error);
+  });
+  console.log(await wssProvider.getNetwork())
+
   const contractAddresses = contractConfig.polygon.Pixelflux;
   
   const stages = [];
@@ -35,7 +53,7 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
 
   for (const [index, address] of contractAddresses.entries()) {
     const wssContract = new Contract(address, contractABIs[index], wssProvider);
-    const jsonContract = new Contract(address, contractABIs[index], jsonProvider);
+    const jsonContract = new Contract(address, contractABIs[index], provider);
     
     wssContract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
       const updatedTotalValue = await jsonContract.calculateTotalValue();

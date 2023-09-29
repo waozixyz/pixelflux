@@ -1,20 +1,7 @@
 import { setupSliderControls } from './pixelBuy';
 import { handlePurchaseClick } from './purchaseLogic';
 import { showNotification, hideNotification } from '../notification';
-
-const showWalletModal = () => {
-  const walletModal = document.getElementById('wallet-modal');
-  if (walletModal) {
-    walletModal.style.display = 'block';
-  }
-}
-
-const hideWalletModal = () => {
-  const walletModal = document.getElementById('wallet-modal');
-  if (walletModal) {
-    walletModal.style.display = 'none';
-  }
-}
+import { showWalletModal, hideWalletModal } from '../walletModal';
 
 const displayConnectedAddress = (address: string) => {
   document.getElementById('connect-text').style.display = 'none';
