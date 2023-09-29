@@ -1,4 +1,4 @@
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
+import { BrowserProvider, JsonRpcProvider, WebSocketProvider } from 'ethers';
 
 import Pixelflux1JSON from '../../build/contracts/Pixelflux1.json';
 import Pixelflux2JSON from '../../build/contracts/Pixelflux2.json';
@@ -32,23 +32,23 @@ const getAnkrProvider = (): JsonRpcProvider | null => {
   return new JsonRpcProvider(ankrUrl);
 };
 
+const getWebsocketProvider = (): WebSocketProvider | null => {
+  const quikUrl = `wss://icy-lively-wildflower.matic.discover.quiknode.pro/${process.env.QUIKNODE_API_KEY}/`;
+  if (!process.env.QUIKNODE_API_KEY) {
+    console.error('Quiknode API key is required.');
+    return null;
+  }
+  console.log('Creating WebSocketProvider with URL:', quikUrl);
+  return new WebSocketProvider(quikUrl);
+}
+
 
 const getProvider = async (): Promise<BrowserProvider | JsonRpcProvider | null> => {
   let provider: BrowserProvider | JsonRpcProvider | null = getBrowserProvider();
-  if (provider) {
-    try {
-      // Attempt to get the network as a test to see if the provider works
-      await provider.getNetwork();
-      return provider;
-    } catch (error) {
-      console.error('BrowserProvider not supported:', error);
-    }
-  }
 
   provider = getInfuraProvider();
   if (provider) {
     try {
-      // Attempt to get the network as a test to see if the provider works
       await provider.getNetwork();
       return provider;
     } catch (error) {
@@ -59,14 +59,12 @@ const getProvider = async (): Promise<BrowserProvider | JsonRpcProvider | null> 
   provider = getAnkrProvider();
   if (provider) {
     try {
-      // Attempt to get the network as a test to see if the provider works
       await provider.getNetwork();
       return provider;
     } catch (error) {
       console.error('AnkrProvider not supported:', error);
     }
   }
-
   return null;
 };
 
@@ -74,4 +72,4 @@ const getProvider = async (): Promise<BrowserProvider | JsonRpcProvider | null> 
 const contractABIs = [Pixelflux1JSON.abi, Pixelflux2JSON.abi, Pixelflux3JSON.abi];
 
 
-export {contractABIs, getProvider, getBrowserProvider, getAnkrProvider }
+export {contractABIs, getProvider, getBrowserProvider, getAnkrProvider, getWebsocketProvider }

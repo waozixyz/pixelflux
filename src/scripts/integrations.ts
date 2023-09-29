@@ -1,7 +1,7 @@
 import { Contract, Log } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../config/contracts.json';
-import { getProvider, contractABIs, getAnkrProvider } from './blockchainProvider';
+import { getProvider, contractABIs, getAnkrProvider, getWebsocketProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 
 
@@ -20,15 +20,15 @@ type StagesResult = {
 
 const getStagesFromContracts = async(): Promise<StagesResult> => {
   const provider = await getProvider();
+  const ankrProvider = getAnkrProvider();
 
   if (!provider) {
     throw new Error('Failed to get a provider.');
   }
 
-  let ankrProvider = getAnkrProvider();
-  
-  const contractAddresses = contractConfig.polygon.Pixelflux;
-  
+  const wssProvider = getWebsocketProvider();
+
+
   const stages = [];
   const totalValues = [];
 
@@ -39,12 +39,32 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
 
   loading.style.display = "block"
 
-  for (const [index, address] of contractAddresses.entries()) {
-    const ankrContract = new Contract(address, contractABIs[index], ankrProvider);
-    const jsonContract = new Contract(address, contractABIs[index], provider);
-    let lastProcessedBlock = await provider.getBlockNumber();
+  const contractAddresses = contractConfig.polygon.Pixelflux;
 
-    setInterval(async () => {
+  for (const [index, address] of contractAddresses.entries()) {  
+    const jsonContract = new Contract(address, contractABIs[index], provider);
+    const wssContract = new Contract(address, contractABIs[index], wssProvider);
+    // const ankrContract = new Contract(address, contractABIs[index], ankrProvider);
+
+    // let lastProcessedBlock = await provider.getBlockNumber();
+      
+    wssContract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
+      const updatedTotalValue = await jsonContract.calculateTotalValue();
+      totalValues[index] = updatedTotalValue;
+      updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, totalValues)
+    });
+
+    if (index !== 0) {
+      try {
+        wssContract.on('ContractEnabled', () => {
+          recreateCanvasForContractEnabled()
+        })
+      } catch (error) {
+        console.log('contract on failed:', error)
+      }
+    }
+    
+    /*setInterval(async () => {
       try {
         const latestBlock = await provider.getBlockNumber();
     
@@ -76,7 +96,7 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
       } catch (error) {
         console.error('Error polling contract events:', error);
       }
-    }, 5000);  
+    }, 5000);  */
     
     const isEnabled = await jsonContract.isContractEnabled();
     
