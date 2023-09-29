@@ -61,7 +61,9 @@ const setupSidebar = async() => {
             } catch (switchError) {
               console.error("Error switching to Polygon:", switchError);
             }
-  
+            displayConnectedAddress(connectedAddress);
+            hideWalletModal();
+
           } else {
             console.log("Account access denied.");
           }

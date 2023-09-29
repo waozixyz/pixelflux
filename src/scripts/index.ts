@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (error.message === 'Failed to get a provider.') {
       showWalletModal();
     } else {
-      showNotification("Error fetching data from Polygon mainnet. Please retry later.");
+      showNotification("Error fetching data from provider. Please retry again later.");
       
     }
   }
