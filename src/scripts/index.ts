@@ -7,6 +7,8 @@ import { showWalletModal } from './walletModal';
 document.addEventListener("DOMContentLoaded", async () => {
   let stages, totalValues
 
+  setupSidebar();
+
   try {
     ({ stages, totalValues } = await getStagesFromContracts());
   } catch (error) {
@@ -21,6 +23,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (stages && stages.length > 0) {
     setupCanvas(stages, totalValues);
-    setupSidebar();
   }
 });

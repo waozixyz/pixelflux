@@ -33,7 +33,7 @@ const setupSidebar = async() => {
   }
 
   if (connectButton) {
-    connectButton.addEventListener('click', showWalletModal);
+    connectButton.addEventListener('click', () => { showWalletModal("") });
   }
 
   if (closeModalButton) {

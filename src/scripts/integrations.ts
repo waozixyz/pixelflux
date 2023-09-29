@@ -1,7 +1,7 @@
-import { Contract, JsonRpcProvider, WebSocketProvider } from 'ethers';
+import { Contract, Log } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../config/contracts.json';
-import { getProvider, contractABIs, getWebsocketProvider } from './blockchainProvider';
+import { getProvider, contractABIs, getAnkrProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 
 
@@ -25,20 +25,8 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
     throw new Error('Failed to get a provider.');
   }
 
-  let wssProvider
-  try {
-    wssProvider = getWebsocketProvider();
-  } catch (error) {
-    console.error('Error creating WebSocketProvider:', error);
-  }
+  let ankrProvider = getAnkrProvider();
   
-  await wssProvider.getNetwork().then(network => {
-    console.log("wss:", network);
-  }).catch(error => {
-      console.error('Error getting network:', error);
-  });
-  console.log(await wssProvider.getNetwork())
-
   const contractAddresses = contractConfig.polygon.Pixelflux;
   
   const stages = [];
@@ -52,24 +40,44 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
   loading.style.display = "block"
 
   for (const [index, address] of contractAddresses.entries()) {
-    const wssContract = new Contract(address, contractABIs[index], wssProvider);
+    const ankrContract = new Contract(address, contractABIs[index], ankrProvider);
     const jsonContract = new Contract(address, contractABIs[index], provider);
-    
-    wssContract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
-      const updatedTotalValue = await jsonContract.calculateTotalValue();
-      totalValues[index] = updatedTotalValue;
-      updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, totalValues)
-    });
+    let lastProcessedBlock = await provider.getBlockNumber();
 
-    if (index !== 0) {
+    setInterval(async () => {
       try {
-        wssContract.on('ContractEnabled', () => {
-          recreateCanvasForContractEnabled()
-        })
+        const latestBlock = await provider.getBlockNumber();
+    
+        if (latestBlock > lastProcessedBlock) {
+          const logs = await ankrContract.queryFilter('*', lastProcessedBlock + 1, latestBlock);
+              
+          for (const log of logs) {
+            const mutableLog = {
+              ...log,
+              topics: [...log.topics],
+            };
+
+            const event = ankrContract.interface.parseLog(mutableLog);
+            if (event.name === 'LayerPurchased') {
+              const { buyer, x, y, numLayers, color } = event.args;
+              const updatedTotalValue = await jsonContract.calculateTotalValue();
+              totalValues[index] = updatedTotalValue;
+              updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, totalValues);
+            }
+
+            if (event.name === 'ContractEnabled') {
+              recreateCanvasForContractEnabled();
+            }
+          }
+
+          lastProcessedBlock = latestBlock;
+        }
+
       } catch (error) {
-        console.log('contract on failed:', error)
+        console.error('Error polling contract events:', error);
       }
-    }
+    }, 5000);  
+    
     const isEnabled = await jsonContract.isContractEnabled();
     
     const stageData = {

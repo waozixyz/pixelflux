@@ -1,4 +1,4 @@
-const showWalletModal = (message?: string) => {
+const showWalletModal = (message?: string): void => {
   const walletModal = document.getElementById('wallet-modal');
   const modalMessage = document.getElementById('modal-message');
   if (walletModal && modalMessage) {
@@ -11,7 +11,7 @@ const showWalletModal = (message?: string) => {
   }
 };
 
-const hideWalletModal = () => {
+const hideWalletModal = (): void => {
   const walletModal = document.getElementById('wallet-modal');
   if (walletModal) {
     walletModal.style.display = 'none';
