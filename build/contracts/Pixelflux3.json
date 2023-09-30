@@ -21997,8 +21997,8 @@
         }
       },
       "links": {},
-      "address": "0x57DDf83471F3829761C161405762442531f13553",
-      "transactionHash": "0x05ccb42a89da0f091d18388a054aac00619e4c7a110c2ba5e49c8173d454cff4"
+      "address": "0x065cFc82218186e7113c476C23F201227639f2C4",
+      "transactionHash": "0xa3e5075b3f61d259867d521279b05b3a724b439db03a23dbe228b50f4638ebea"
     },
     "5777": {
       "events": {
@@ -22028,7 +22028,7 @@
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-09-30T04:11:21.978Z",
+  "updatedAt": "2023-09-30T04:41:41.298Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
