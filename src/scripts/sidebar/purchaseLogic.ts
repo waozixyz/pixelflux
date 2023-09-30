@@ -44,7 +44,6 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
     const signer = await provider.getSigner(userAddress);
     const contract = new Contract(contractAddress, contractABIs[stage], signer);
     const totalValueToSend = calculateTotalValueToSend(numLayersToAdd);
-    console.log(totalValueToSend.toString())
 
     let gasEstimation
     try {
@@ -55,7 +54,7 @@ const buyLayers = async(provider: any, userAddress: string, contractAddress: str
     if (!gasEstimation) {
       gasEstimation = estimateGas(numLayersToAdd);
     }
-    console.log(gasEstimation)
+
     if (numLayersToAdd === 1) {
       await contract.buyLayer(x, y, color, { value: totalValueToSend.toString(), gasLimit: gasEstimation, gas: gasEstimation });
     } else {
