@@ -1,7 +1,7 @@
 import { Contract, Log } from 'ethers';
 import { Stage } from './interfaces';
 import contractConfig from '../config/contracts.json';
-import { getProvider, contractABIs, getAnkrProvider, getWebsocketProvider } from './blockchainProvider';
+import { getProvider, contractABIs, getWebsocketProvider } from './blockchainProvider';
 import { updateCanvasCell, recreateCanvasForContractEnabled } from './canvas/utility';
 
 
@@ -20,8 +20,7 @@ type StagesResult = {
 
 const getStagesFromContracts = async(): Promise<StagesResult> => {
   const provider = await getProvider();
-  const ankrProvider = getAnkrProvider();
-
+  
   if (!provider) {
     throw new Error('Failed to get a provider.');
   }
@@ -44,10 +43,6 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
   for (const [index, address] of contractAddresses.entries()) {  
     const jsonContract = new Contract(address, contractABIs[index], provider);
     const wssContract = new Contract(address, contractABIs[index], wssProvider);
-    // const ankrContract = new Contract(address, contractABIs[index], ankrProvider);
-
-    // let lastProcessedBlock = await provider.getBlockNumber();
-      
     wssContract.on('LayerPurchased', async(buyer, x, y, numLayers, color) => {
       const updatedTotalValue = await jsonContract.calculateTotalValue();
       totalValues[index] = updatedTotalValue;
@@ -64,39 +59,6 @@ const getStagesFromContracts = async(): Promise<StagesResult> => {
       }
     }
     
-    /*setInterval(async () => {
-      try {
-        const latestBlock = await provider.getBlockNumber();
-    
-        if (latestBlock > lastProcessedBlock) {
-          const logs = await ankrContract.queryFilter('*', lastProcessedBlock + 1, latestBlock);
-              
-          for (const log of logs) {
-            const mutableLog = {
-              ...log,
-              topics: [...log.topics],
-            };
-
-            const event = ankrContract.interface.parseLog(mutableLog);
-            if (event.name === 'LayerPurchased') {
-              const { buyer, x, y, numLayers, color } = event.args;
-              const updatedTotalValue = await jsonContract.calculateTotalValue();
-              totalValues[index] = updatedTotalValue;
-              updateCanvasCell(buyer, Number(x), Number(y), Number(numLayers), color, index, totalValues);
-            }
-
-            if (event.name === 'ContractEnabled') {
-              recreateCanvasForContractEnabled();
-            }
-          }
-
-          lastProcessedBlock = latestBlock;
-        }
-
-      } catch (error) {
-        console.error('Error polling contract events:', error);
-      }
-    }, 5000);  */
     
     const isEnabled = await jsonContract.isContractEnabled();
     

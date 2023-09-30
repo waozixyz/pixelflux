@@ -17,13 +17,6 @@ const setupSidebar = async() => {
     closeNotificationButton.addEventListener('click', hideNotification);
   }
   
-  const tooltipInfo = document.getElementById('tooltip-info');
-
-  tooltipInfo.addEventListener('click', function() {
-      showNotification("Buying a layer redistributes funds to current layer owners. When you purchase multiple layers, the incremental cost for each layer can circle back to you, especially if you own existing layers.");
-  });
-  
-  
   const connectButton = document.getElementById('connect-wallet');
   const closeModalButton = document.getElementById('close-modal');
   const metamaskOption = document.getElementById('metamask-option');

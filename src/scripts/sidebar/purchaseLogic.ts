@@ -11,43 +11,58 @@ const GAS_PER_EXISTING_LAYER = 20000;
 const GAS_PER_NEW_LAYER = 15000;
 const BUFFER_MULTIPLIER = 1.20;
 
+
 const calculateTotalValueToSend = (numLayersToAdd: number) => {
   const currentLayersCount = store.selectedSquare.squareLayers.length;
   const baseValueInWei = new BigNumber(fromMaticToWei(store.selectedSquare.squareValue));
   
-  // Calculate the sum of the series using BigNumber
   const sumOfSeries = new BigNumber(numLayersToAdd)
     .multipliedBy(2 * currentLayersCount + numLayersToAdd - 1)
     .dividedBy(2);
 
-  return baseValueInWei.multipliedBy(sumOfSeries);
+  const refundAmount = baseValueInWei
+    .multipliedBy(numLayersToAdd * (numLayersToAdd - 1))
+    .dividedBy(2);
+
+
+  return baseValueInWei.multipliedBy(sumOfSeries).minus(refundAmount);
 };
 
 const estimateGas = (numLayersToAdd: number) => {
   const currentLayersCount = store.selectedSquare.squareLayers.length;
 
-  return Math.ceil(
+  return Math.ceil((
       BASE_GAS + 
       (GAS_PER_EXISTING_LAYER * currentLayersCount) + 
       (GAS_PER_NEW_LAYER * numLayersToAdd)
-  ) * BUFFER_MULTIPLIER;
+  ) * BUFFER_MULTIPLIER);
 }
+
 
 const buyLayers = async(provider: any, userAddress: string, contractAddress: string, x: number, y: number, numLayersToAdd: number, color: string, stage: number) => {
   try {
     const signer = await provider.getSigner(userAddress);
     const contract = new Contract(contractAddress, contractABIs[stage], signer);
-
     const totalValueToSend = calculateTotalValueToSend(numLayersToAdd);
+    console.log(totalValueToSend.toString())
 
-    const estimatedGas = estimateGas(numLayersToAdd);
+    let gasEstimation
+    try {
+      gasEstimation = await contract.buyMultipleLayers.estimateGas(x, y, numLayersToAdd, color, { value: totalValueToSend.toString() });
+    } catch (error) {
+      console.log('could not estimate gas', error)
+    }
+    if (!gasEstimation) {
+      gasEstimation = estimateGas(numLayersToAdd);
+    }
+    console.log(gasEstimation)
     if (numLayersToAdd === 1) {
-      await contract.buyLayer(x, y, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
+      await contract.buyLayer(x, y, color, { value: totalValueToSend.toString(), gasLimit: gasEstimation, gas: gasEstimation });
     } else {
-      await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString(), gasLimit: estimatedGas });
+      await contract.buyMultipleLayers(x, y, numLayersToAdd, color, { value: totalValueToSend.toString(), gasLimit: gasEstimation, gas: gasEstimation });
     }
   } catch (error) {
-    if (error.info.error.code === 4001) {
+    if (error.info && error.info.error && error.info.error.code === 4001) {
       console.log("User cancelled the transaction.");
     } else {
       console.error("Contract interaction error:", error);

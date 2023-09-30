@@ -12,12 +12,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     ({ stages, totalValues } = await getStagesFromContracts());
   } catch (error) {
-    console.log(error)
     if (error.message === 'Failed to get a provider.') {
       showWalletModal();
     } else {
       showNotification("Error fetching data from provider. Please retry again later.");
-      
     }
   }
 

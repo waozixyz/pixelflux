@@ -74,19 +74,19 @@ abstract contract BaseContract {
         uint256 baseValueForCellInWei = grid[y][x].baseValue * 10**9;
         uint256 currentLayersCount = grid[y][x].layers.length;
         uint256 sumOfSeries = numLayersToAdd * (2 * currentLayersCount + numLayersToAdd - 1) / 2;
-        uint256 totalCost = baseValueForCellInWei * sumOfSeries;
+
+        uint256 refundAmount = baseValueForCellInWei * (numLayersToAdd * (numLayersToAdd - 1) / 2);
+
+        uint256 totalCost = (baseValueForCellInWei * sumOfSeries) - refundAmount;
+
         require(msg.value == totalCost, "Incorrect POL sent");
-        
-        for (uint256 i = 0; i < numLayersToAdd; i++) {
-            for (uint256 j = 0; j < currentLayersCount; j++) {
-                address layerOwner = grid[y][x].layers[j].owner;
-                payoutMap[layerOwner] += baseValueForCellInWei;
-            }
-            currentLayersCount++;
+
+        for (uint256 j = 0; j < currentLayersCount; j++) {
+            address layerOwner = grid[y][x].layers[j].owner;
+            payoutMap[layerOwner] += baseValueForCellInWei * numLayersToAdd;
         }
 
         payoutOwners(x, y);
-
 
         for (uint256 i = 0; i < numLayersToAdd; i++) {
             grid[y][x].layers.push(Layer({
@@ -97,6 +97,7 @@ abstract contract BaseContract {
 
         emit LayerPurchased(msg.sender, x, y, numLayersToAdd, color);
     }
+
 
     function payoutOwners(uint x, uint y) internal {
         for (uint256 i = 0; i < grid[y][x].layers.length; i++) {
