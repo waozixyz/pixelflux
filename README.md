@@ -14,7 +14,7 @@ You need to have Node.js and npm installed on your machine. If you don't have th
 
 1. Clone the repository
 ```bash
-git clone https://github.com/alpega/pixelflux-evm.git
+git clone https://github.com/alpega/pixelflux.git
 ```
 2. Navigate into the project directory
 ```bash
