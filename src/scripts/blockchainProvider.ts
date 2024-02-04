@@ -33,7 +33,7 @@ const getAnkrProvider = (): JsonRpcProvider | null => {
 };
 
 const getWebsocketProvider = (): WebSocketProvider | null => {
-  const quikUrl = `wss://icy-lively-wildflower.matic.discover.quiknode.pro/${process.env.QUIKNODE_API_KEY}/`;
+  const quikUrl = `wss://little-responsive-yard.matic.quiknode.pro/${process.env.QUIKNODE_API_KEY}/`;
   if (!process.env.QUIKNODE_API_KEY) {
     console.error('Quiknode API key is required.');
     return null;
