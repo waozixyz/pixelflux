@@ -35,7 +35,7 @@ const setupSidebar = async() => {
 
   if (metamaskOption) {
     metamaskOption.addEventListener('click', async () => {
-      console.log("Connecting with MetaMask...");
+      console.log("Connecting with Browser Wallet...");
   
       if (typeof window.ethereum !== 'undefined') {
         try {
@@ -62,11 +62,11 @@ const setupSidebar = async() => {
           }
   
         } catch (err) {
-          console.error("Error connecting to MetaMask:", err);
+          console.error("Error connecting to Browser Wallet:", err);
         }
   
       } else {
-        console.log("MetaMask is not installed.");
+        console.log("Browser Wallet is not installed.");
       }
     });
     

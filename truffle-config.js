@@ -5,13 +5,12 @@ const privateKey = process.env.PRIVATE_KEY;
 module.exports = {
   networks: {
     matic: {
-      provider: () => new HDWalletProvider(privateKey, `https://rpc.ankr.com/polygon/${process.env.ANKR_API_KEY}`),
+      provider: () => new HDWalletProvider(privateKey, `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATICVIGIL_API_KEY}`),
       network_id: 137,
       confirmations: 2,
       timeoutBlocks: 200,
-      gas: 24354410,
-      gasPrice: 80000000000,
-      skipDryRun: true
+      skipDryRun: true,
+      chainId: 137
     },
     development: {
       host: "127.0.0.1",
