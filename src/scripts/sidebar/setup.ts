@@ -19,7 +19,7 @@ const setupSidebar = async() => {
   
   const connectButton = document.getElementById('connect-wallet');
   const closeModalButton = document.getElementById('close-modal');
-  const metamaskOption = document.getElementById('metamask-option');
+  const metamaskOption = document.getElementById('browser-wallet-option');
   const purchaseLayerButton = document.getElementById('purchase-button') as HTMLButtonElement;
   if (purchaseLayerButton) {
     purchaseLayerButton.addEventListener('click', handlePurchaseClick);

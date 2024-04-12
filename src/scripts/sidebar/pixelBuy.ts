@@ -1,6 +1,6 @@
 import { default as defaultColors } from '../../config/colors.json';
 import { store } from "../store";
-import { convertToFullHex, fromWeiToMatic, roundToTwoSignificantFigures } from '../utils'
+import { convertToFullHex, fromWeiToMatic } from '../utils'
 import { updateColorDisplay} from "./pixelCard";
 import { calculateTotalValueToSend } from './purchaseLogic';
 

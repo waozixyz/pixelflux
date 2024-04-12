@@ -41,18 +41,17 @@ const getWebsocketProvider = (): WebSocketProvider | null => {
   console.log('Creating WebSocketProvider with URL:', quikUrl);
   return new WebSocketProvider(quikUrl);
 }
-
-
 const getProvider = async (): Promise<BrowserProvider | JsonRpcProvider | null> => {
-  let provider: BrowserProvider | JsonRpcProvider | null = getBrowserProvider();
-
-  provider = getInfuraProvider();
+  let provider: BrowserProvider | JsonRpcProvider | null = getInfuraProvider();
   if (provider) {
     try {
       await provider.getNetwork();
       return provider;
     } catch (error) {
-      console.error('InfuraProvider not supported:', error);
+      // Log error only if it's not a 403 Forbidden error
+      if (!error.message.includes('403')) {
+        console.error('InfuraProvider not supported:', error);
+      }
     }
   }
 
@@ -65,10 +64,21 @@ const getProvider = async (): Promise<BrowserProvider | JsonRpcProvider | null> 
       console.error('AnkrProvider not supported:', error);
     }
   }
+
+  provider = getBrowserProvider();
+  if (provider) {
+    try {
+      await provider.getNetwork();
+      return provider;
+    } catch (error) {
+      console.error('BrowserProvider not supported:', error);
+    }
+  }
+
   return null;
 };
 
- 
+
 const contractABIs = [Pixelflux1JSON.abi, Pixelflux2JSON.abi, Pixelflux3JSON.abi];
 
 
